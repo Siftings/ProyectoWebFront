@@ -1,1 +1,214 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  --color-bg: #ffffff;
+  --color-surface: #f5f5f5;
+  --color-border: #d4d4d4;
+  --color-text: #1a1a1a;
+  --color-text-muted: #595959;
+  --color-accent: #1d4ed8;
+  --color-accent-text: #ffffff;
+  --color-error: #b91c1c;
+  --color-success: #15803d;
+  --color-warning: #a16207;
+
+  --font-family: system-ui, sans-serif;
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.5rem;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+
+  --radius: 4px;
+  --border: 1px solid var(--color-border);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-family);
+  font-size: var(--text-md);
+  line-height: 1.5;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0 0 var(--space-4);
+  line-height: 1.25;
+}
+
+h1 {
+  font-size: var(--text-xl);
+}
+
+h2 {
+  font-size: var(--text-lg);
+}
+
+h3 {
+  font-size: var(--text-md);
+}
+
+a {
+  color: var(--color-accent);
+}
+
+label {
+  display: block;
+  margin-bottom: var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: var(--border);
+  border-radius: var(--radius);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font: inherit;
+}
+
+input[type='checkbox'],
+input[type='radio'] {
+  width: auto;
+  padding: 0;
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+input.ng-invalid.ng-touched,
+select.ng-invalid.ng-touched,
+textarea.ng-invalid.ng-touched {
+  border-color: var(--color-error);
+}
+
+input:disabled,
+select:disabled,
+textarea:disabled {
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+}
+
+button {
+  padding: var(--space-2) var(--space-4);
+  border: var(--border);
+  border-radius: var(--radius);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font: inherit;
+  cursor: pointer;
+}
+
+button:disabled {
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+}
+
+.btn-primario {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-accent-text);
+}
+
+.btn-primario:disabled {
+  border-color: var(--color-border);
+}
+
+.btn-peligro {
+  border-color: var(--color-error);
+  color: var(--color-error);
+}
+
+.btn-peligro:disabled {
+  border-color: var(--color-border);
+  color: var(--color-text-muted);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: var(--space-3);
+  border: var(--border);
+  text-align: left;
+}
+
+th {
+  background: var(--color-surface);
+  font-weight: 600;
+}
+
+.tarjeta {
+  padding: var(--space-6);
+  border: var(--border);
+  border-radius: var(--radius);
+  background: var(--color-bg);
+}
+
+.alerta {
+  padding: var(--space-3) var(--space-4);
+  border: var(--border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.alerta-error {
+  border-color: var(--color-error);
+  color: var(--color-error);
+}
+
+.alerta-exito {
+  border-color: var(--color-success);
+  color: var(--color-success);
+}
+
+.alerta-aviso {
+  border-color: var(--color-warning);
+  color: var(--color-warning);
+}
+
+.error-campo {
+  margin-top: var(--space-1);
+  color: var(--color-error);
+  font-size: var(--text-sm);
+}
+
+dialog {
+  max-width: 32rem;
+  padding: var(--space-6);
+  border: var(--border);
+  border-radius: var(--radius);
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+dialog::backdrop {
+  background: rgb(0 0 0 / 0.4);
+}
