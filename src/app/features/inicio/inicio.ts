@@ -1,6 +1,6 @@
-// Pantalla de inicio provisional con los datos de la sesión.
+// Pantalla de inicio provisional con el usuario fijo de la configuración.
 import { Component, inject } from '@angular/core';
-import { AuthService } from '../../core/services/auth.service';
+import { UsuarioActualService } from '../../core/services/usuario-actual.service';
 import { ETIQUETAS_ROL_ACCESO } from '../../models/enums';
 
 @Component({
@@ -8,6 +8,6 @@ import { ETIQUETAS_ROL_ACCESO } from '../../models/enums';
   templateUrl: './inicio.html',
 })
 export class Inicio {
-  protected readonly auth = inject(AuthService);
+  protected readonly usuarioActual = inject(UsuarioActualService);
   protected readonly etiquetasRol = ETIQUETAS_ROL_ACCESO;
 }

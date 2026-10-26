@@ -5,12 +5,9 @@
       <a [routerLink]="enlace.ruta" routerLinkActive="activo">{{ enlace.texto }}</a>
     }
   </nav>
-  @if (auth.usuario(); as usuario) {
-    <div class="sesion">
-      <span>{{ usuario.nombre }} · {{ etiquetasRol[usuario.rolAcceso] }}</span>
-      <button type="button" (click)="cerrarSesion()">Cerrar sesión</button>
-    </div>
-  }
+  <span class="usuario">
+    {{ usuarioActual.usuario().email }} · {{ etiquetasRol[usuarioActual.rol()] }}
+  </span>
 </header>
 <main class="contenido">
   <router-outlet />
