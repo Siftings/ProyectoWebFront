@@ -1,0 +1,22 @@
+.login {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-8) var(--space-4);
+}
+
+.tarjeta {
+  width: 100%;
+  max-width: 24rem;
+}
+
+.campo {
+  margin-bottom: var(--space-4);
+}
+
+.alerta {
+  margin: 0 0 var(--space-4);
+}
+
+button[type='submit'] {
+  width: 100%;
+}

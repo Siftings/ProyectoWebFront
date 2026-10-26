@@ -1,0 +1,17 @@
+<header class="barra">
+  <a class="marca" routerLink="/">Procesos BPMN</a>
+  <nav class="menu" aria-label="Principal">
+    @for (enlace of enlaces(); track enlace.ruta) {
+      <a [routerLink]="enlace.ruta" routerLinkActive="activo">{{ enlace.texto }}</a>
+    }
+  </nav>
+  @if (auth.usuario(); as usuario) {
+    <div class="sesion">
+      <span>{{ usuario.nombre }} · {{ etiquetasRol[usuario.rolAcceso] }}</span>
+      <button type="button" (click)="cerrarSesion()">Cerrar sesión</button>
+    </div>
+  }
+</header>
+<main class="contenido">
+  <router-outlet />
+</main>

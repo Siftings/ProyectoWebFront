@@ -1,0 +1,39 @@
+.barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-6);
+  border-bottom: var(--border);
+  background: var(--color-surface);
+}
+
+.marca {
+  color: var(--color-text);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.menu {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.menu a.activo {
+  font-weight: 600;
+}
+
+.sesion {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  margin-left: auto;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.contenido {
+  padding: var(--space-6);
+}

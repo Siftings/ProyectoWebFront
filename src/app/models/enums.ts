@@ -37,3 +37,9 @@ export const ETIQUETAS_TIPO_EVENTO: Record<TipoEventoMensaje, string> = {
   CATCH_INICIO: 'Inicio por mensaje',
   CATCH_INTERMEDIO: 'Recepción intermedia',
 };
+
+export const ETIQUETAS_ROL_ACCESO: Record<RolAcceso, string> = {
+  ADMINISTRADOR: 'Administrador',
+  EDITOR: 'Editor',
+  SOLO_LECTURA: 'Solo lectura',
+};
