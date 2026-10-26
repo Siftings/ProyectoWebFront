@@ -1,4 +1,3 @@
-@if (auth.usuario(); as usuario) {
-  <h1>Hola, {{ usuario.nombre }}</h1>
-  <p>Rol: {{ etiquetasRol[usuario.rolAcceso] }}</p>
-}
+<h1>Inicio</h1>
+<p>Usuario: {{ usuarioActual.usuario().email }}</p>
+<p>Rol: {{ etiquetasRol[usuarioActual.rol()] }}</p>

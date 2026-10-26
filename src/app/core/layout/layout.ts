@@ -1,8 +1,8 @@
-// Estructura de las pantallas con sesión: barra superior con menú según el rol y contenido.
+// Estructura de las pantallas: barra superior con menú según el rol del usuario fijo y contenido.
 import { Component, computed, inject } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { ETIQUETAS_ROL_ACCESO, RolAcceso } from '../../models/enums';
-import { AuthService } from '../services/auth.service';
+import { UsuarioActualService } from '../services/usuario-actual.service';
 
 interface EnlaceMenu {
   texto: string;
@@ -25,16 +25,11 @@ const MENU: EnlaceMenu[] = [
   templateUrl: './layout.html',
 })
 export class Layout {
-  protected readonly auth = inject(AuthService);
-  private readonly router = inject(Router);
+  protected readonly usuarioActual = inject(UsuarioActualService);
   protected readonly etiquetasRol = ETIQUETAS_ROL_ACCESO;
 
   protected readonly enlaces = computed(() => {
-    const rol = this.auth.rol();
-    return MENU.filter((e) => !e.roles || (rol !== null && e.roles.includes(rol)));
+    const rol = this.usuarioActual.rol();
+    return MENU.filter((e) => !e.roles || e.roles.includes(rol));
   });
-
-  cerrarSesion(): void {
-    this.auth.logout().subscribe(() => this.router.navigate(['/login']));
-  }
 }
