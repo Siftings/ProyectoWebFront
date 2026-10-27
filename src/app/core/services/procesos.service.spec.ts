@@ -76,6 +76,22 @@ describe('ProcesosService', () => {
     req.flush({ proceso: PROCESO, historial: [] });
   });
 
+  it('diagrama hace GET /procesos/{id}/diagrama', () => {
+    servicio.diagrama(4).subscribe();
+    const req = http.expectOne('http://api/procesos/4/diagrama');
+    expect(req.request.method).toBe('GET');
+    req.flush({
+      proceso: PROCESO,
+      pools: [],
+      lanes: [],
+      actividades: [],
+      gateways: [],
+      eventos: [],
+      arcos: [],
+      mensajes: [],
+    });
+  });
+
   it('crear hace POST /procesos con la solicitud', () => {
     servicio.crear(SOLICITUD).subscribe();
     const req = http.expectOne('http://api/procesos');

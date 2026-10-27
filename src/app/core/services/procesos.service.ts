@@ -1,4 +1,4 @@
-// Procesos: listado paginado con filtros, detalle, alta, edición, publicación y baja lógica.
+// Procesos: listado paginado con filtros, detalle, diagrama, alta, edición, publicación y baja lógica.
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
@@ -8,6 +8,7 @@ import { EstadoProceso } from '../../models/enums';
 import {
   CambiarEstadoProcesoRequest,
   ProcesoDetalleResponse,
+  ProcesoDiagramaResponse,
   ProcesoRequest,
   ProcesoResponse,
 } from '../../models/proceso';
@@ -47,6 +48,10 @@ export class ProcesosService {
 
   obtener(id: number): Observable<ProcesoDetalleResponse> {
     return this.http.get<ProcesoDetalleResponse>(`${this.url}/${id}`);
+  }
+
+  diagrama(id: number): Observable<ProcesoDiagramaResponse> {
+    return this.http.get<ProcesoDiagramaResponse>(`${this.url}/${id}/diagrama`);
   }
 
   crear(req: ProcesoRequest): Observable<ProcesoResponse> {
