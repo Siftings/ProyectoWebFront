@@ -1,0 +1,84 @@
+<p><a [routerLink]="['/procesos', id]">Volver al proceso</a></p>
+
+@if (estado.cargando()) {
+  <p>Cargando…</p>
+}
+<app-alerta-error [mensaje]="estado.error()" />
+
+@if (estado.diagrama(); as datos) {
+  <div class="encabezado">
+    <h1>{{ datos.proceso.nombre }}</h1>
+    <app-estado-badge [estado]="datos.proceso.estado" />
+  </div>
+
+  @if (estado.motivoSoloLectura(); as motivo) {
+    <p class="alerta alerta-aviso">{{ motivo }}</p>
+  }
+
+  <div class="cuerpo">
+    <div class="lienzo">
+      @if (estado.arbol().length === 0) {
+        <p class="vacio">El diagrama no tiene pools.</p>
+      } @else {
+        <app-diagrama-canvas
+          [arbol]="estado.arbol()"
+          [seleccion]="estado.seleccion()"
+          (seleccionar)="estado.seleccionar($event)"
+        />
+      }
+    </div>
+
+    <aside class="panel tarjeta" aria-label="Selección">
+      <h2>Selección</h2>
+      @if (estado.seleccionado(); as s) {
+        <dl class="datos">
+          @if (s.tipo === 'pool') {
+            <dt>Elemento</dt>
+            <dd>Pool</dd>
+            <dt>Nombre</dt>
+            <dd>{{ s.pool.nombre }}</dd>
+            <dt>Participante</dt>
+            <dd>{{ participante[s.pool.tipoParticipante] }}</dd>
+            <dt>Caja negra</dt>
+            <dd>{{ s.pool.cajaNegra ? 'Sí' : 'No' }}</dd>
+          } @else if (s.tipo === 'lane') {
+            <dt>Elemento</dt>
+            <dd>Lane</dd>
+            <dt>Nombre</dt>
+            <dd>{{ s.lane.nombre }}</dd>
+            <dt>Rol de proceso</dt>
+            <dd>{{ s.lane.rolProcesoNombre }}</dd>
+          } @else if (s.tipo === 'nodo') {
+            <dt>Elemento</dt>
+            <dd>{{ s.nodo.kind === 'actividad' ? 'Actividad' : s.nodo.kind === 'gateway' ? 'Gateway' : 'Evento de mensaje' }}</dd>
+            <dt>Nombre</dt>
+            <dd>{{ s.nodo.nombre }}</dd>
+            <dt>Tipo</dt>
+            <dd>{{ tipoNodo(s.nodo) }}</dd>
+            @if (s.nodo.kind === 'actividad') {
+              <dt>Descripción</dt>
+              <dd>{{ s.nodo.descripcion || 'Sin descripción' }}</dd>
+            }
+            @if (s.nodo.kind === 'evento') {
+              <dt>Clave de correlación</dt>
+              <dd>{{ s.nodo.claveCorrelacion }}</dd>
+            }
+          } @else {
+            <dt>Elemento</dt>
+            <dd>Arco</dd>
+            <dt>Origen</dt>
+            <dd>{{ s.origen }}</dd>
+            <dt>Destino</dt>
+            <dd>{{ s.destino }}</dd>
+            <dt>Etiqueta</dt>
+            <dd>{{ s.arco.etiqueta || 'Sin etiqueta' }}</dd>
+            <dt>Condición</dt>
+            <dd>{{ s.arco.condicion || 'Sin condición' }}</dd>
+          }
+        </dl>
+      } @else {
+        <p>Selecciona un elemento del diagrama.</p>
+      }
+    </aside>
+  </div>
+}

@@ -35,6 +35,10 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'procesos/:id/diagrama',
+        loadComponent: () => import('./features/editor/editor').then((m) => m.Editor),
+      },
+      {
         path: 'roles',
         loadComponent: () => import('./features/roles/lista/roles-lista').then((m) => m.RolesLista),
       },

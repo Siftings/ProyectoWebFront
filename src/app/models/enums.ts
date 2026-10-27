@@ -17,6 +17,13 @@ export type PoliticaFalloNotificacion = 'CONTINUAR_FLUJO' | 'DERIVAR_ACTIVIDAD_E
 
 export type PoliticaMensajeSinCaso = 'DESCARTAR' | 'INICIAR_CASO_NUEVO';
 
+export const ETIQUETAS_TIPO_PARTICIPANTE: Record<TipoParticipante, string> = {
+  EMPRESA: 'Empresa',
+  CLIENTE: 'Cliente',
+  PROVEEDOR: 'Proveedor',
+  SISTEMA_EXTERNO: 'Sistema externo',
+};
+
 export const ETIQUETAS_TIPO_ACTIVIDAD: Record<TipoActividad, string> = {
   TAREA: 'Tarea',
   USUARIO: 'Tarea de usuario',

@@ -1,0 +1,51 @@
+.encabezado {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+  margin-bottom: var(--space-3);
+}
+
+.encabezado h1 {
+  margin: 0;
+}
+
+.cuerpo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 20rem;
+  gap: var(--space-4);
+  align-items: start;
+}
+
+.lienzo {
+  overflow: auto;
+  max-height: 70vh;
+  border: var(--border);
+  border-radius: var(--radius);
+}
+
+.vacio {
+  margin: var(--space-4);
+}
+
+.datos {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--space-2) var(--space-4);
+  margin: 0;
+}
+
+.datos dt {
+  font-weight: 600;
+}
+
+.datos dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 48rem) {
+  .cuerpo {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
