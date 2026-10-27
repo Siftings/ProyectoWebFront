@@ -49,6 +49,28 @@ export const routes: Routes = [
           import('./features/roles/formulario/rol-formulario').then((m) => m.RolFormulario),
       },
       {
+        path: 'usuarios',
+        loadComponent: () =>
+          import('./features/usuarios/lista/usuarios-lista').then((m) => m.UsuariosLista),
+      },
+      {
+        path: 'usuarios/nuevo',
+        loadComponent: () =>
+          import('./features/usuarios/formulario/usuario-formulario').then(
+            (m) => m.UsuarioFormulario,
+          ),
+      },
+      {
+        path: 'usuarios/invitar',
+        loadComponent: () =>
+          import('./features/usuarios/invitar/usuario-invitar').then((m) => m.UsuarioInvitar),
+      },
+      {
+        path: 'usuarios/:id/editar',
+        loadComponent: () =>
+          import('./features/usuarios/editar/usuario-editar').then((m) => m.UsuarioEditar),
+      },
+      {
         path: 'registro',
         loadComponent: () => import('./features/registro/registro').then((m) => m.Registro),
       },

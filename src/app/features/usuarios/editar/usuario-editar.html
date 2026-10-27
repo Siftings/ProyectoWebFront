@@ -1,0 +1,32 @@
+<div class="tarjeta formulario">
+  <h1>Editar usuario</h1>
+
+  @if (cargando()) {
+    <p>Cargando…</p>
+  }
+  <app-alerta-error [mensaje]="error()" />
+
+  @if (usuario(); as datos) {
+    <p>{{ datos.nombre }} · {{ datos.email }}</p>
+
+    <form [formGroup]="form" (ngSubmit)="enviar()">
+      <div class="campo">
+        <label for="rolAcceso">Rol</label>
+        <select id="rolAcceso" formControlName="rolAcceso">
+          @for (rol of roles; track rol[0]) {
+            <option [value]="rol[0]">{{ rol[1] }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="campo">
+        <label><input type="checkbox" formControlName="activo" /> Activo</label>
+      </div>
+
+      <button type="submit" class="btn-primario" [disabled]="enviando()">
+        {{ enviando() ? 'Guardando…' : 'Guardar' }}
+      </button>
+    </form>
+  }
+  <p><a routerLink="/usuarios">Cancelar</a></p>
+</div>
