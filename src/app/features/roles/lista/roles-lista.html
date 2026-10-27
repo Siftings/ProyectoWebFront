@@ -1,0 +1,74 @@
+<div class="encabezado">
+  <h1>Roles de proceso</h1>
+  @if (usuario.esAdmin()) {
+    <a class="btn-enlace btn-primario" routerLink="/roles/nuevo">Nuevo rol</a>
+  }
+</div>
+
+<form class="filtros" [formGroup]="form" (ngSubmit)="buscar()">
+  <div class="campo">
+    <label for="filtro-nombre">Nombre</label>
+    <input id="filtro-nombre" type="text" formControlName="nombre" />
+  </div>
+  <div class="campo acciones-filtro">
+    <button type="submit" class="btn-primario">Buscar</button>
+    <button type="button" (click)="limpiar()">Limpiar</button>
+  </div>
+</form>
+
+@if (aviso()) {
+  <p class="alerta alerta-exito" role="status">{{ aviso() }}</p>
+}
+<app-alerta-error [mensaje]="error()" />
+
+@if (cargando()) {
+  <p>Cargando…</p>
+}
+@if (resultado(); as datos) {
+  @if (datos.content.length === 0) {
+    <p>No hay roles que coincidan con el filtro.</p>
+  } @else {
+    <div class="tabla">
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Procesos</th>
+            <th>En uso</th>
+            @if (usuario.esAdmin()) {
+              <th>Acciones</th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (rol of datos.content; track rol.id) {
+            <tr>
+              <td>{{ rol.nombre }}</td>
+              <td>{{ rol.descripcion || '—' }}</td>
+              <td>{{ rol.procesos.length ? rol.procesos.join(', ') : '—' }}</td>
+              <td>{{ rol.enUso ? 'Sí' : 'No' }}</td>
+              @if (usuario.esAdmin()) {
+                <td class="acciones">
+                  <a class="btn-enlace" [routerLink]="['/roles', rol.id, 'editar']">Editar</a>
+                  <button type="button" class="btn-peligro" (click)="pendiente.set(rol)">Eliminar</button>
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <app-paginador [pagina]="datos.page" [totalPaginas]="datos.totalPages" (cambiar)="cargar($event)" />
+  }
+}
+
+<app-confirm-dialog
+  [abierto]="pendiente() !== null"
+  titulo="Eliminar rol"
+  [mensaje]="pendiente() ? 'Se eliminará «' + pendiente()!.nombre + '».' : ''"
+  textoConfirmar="Eliminar"
+  [peligro]="true"
+  (confirmar)="confirmar()"
+  (cancelar)="pendiente.set(null)"
+/>

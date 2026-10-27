@@ -35,6 +35,20 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'roles',
+        loadComponent: () => import('./features/roles/lista/roles-lista').then((m) => m.RolesLista),
+      },
+      {
+        path: 'roles/nuevo',
+        loadComponent: () =>
+          import('./features/roles/formulario/rol-formulario').then((m) => m.RolFormulario),
+      },
+      {
+        path: 'roles/:id/editar',
+        loadComponent: () =>
+          import('./features/roles/formulario/rol-formulario').then((m) => m.RolFormulario),
+      },
+      {
         path: 'registro',
         loadComponent: () => import('./features/registro/registro').then((m) => m.Registro),
       },
