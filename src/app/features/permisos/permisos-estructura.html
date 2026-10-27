@@ -1,0 +1,62 @@
+<h1>Permisos de estructura</h1>
+<p>
+  Define qué puede hacer cada rol con los pools y las lanes de un diagrama. El rol Editor no puede eliminar aunque se
+  marque la casilla: el servidor lo bloquea.
+</p>
+
+@if (aviso()) {
+  <p class="alerta alerta-exito" role="status">{{ aviso() }}</p>
+}
+<app-alerta-error [mensaje]="error()" />
+
+@if (cargando()) {
+  <p>Cargando…</p>
+}
+@if (filas(); as filas) {
+  <div class="tabla">
+    <table>
+      <thead>
+        <tr>
+          <th>Rol</th>
+          @for (columna of columnas; track columna.campo) {
+            <th class="casilla">{{ columna.texto }}</th>
+          }
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (fila of filas; track fila.rolAcceso) {
+          <tr>
+            <td>{{ etiquetasRol[fila.rolAcceso] }}</td>
+            @for (columna of columnas; track columna.campo) {
+              <td class="casilla">
+                <input
+                  #casilla
+                  type="checkbox"
+                  [checked]="fila[columna.campo]"
+                  [disabled]="fila.rolAcceso === 'SOLO_LECTURA' || guardando() === fila.rolAcceso"
+                  [attr.aria-label]="columna.texto + ' · ' + etiquetasRol[fila.rolAcceso]"
+                  (change)="marcar(fila.rolAcceso, columna.campo, casilla.checked)"
+                />
+              </td>
+            }
+            <td>
+              @if (fila.rolAcceso === 'SOLO_LECTURA') {
+                Sin permisos
+              } @else {
+                <button
+                  type="button"
+                  class="btn-primario"
+                  [disabled]="guardando() !== null"
+                  (click)="guardar(fila)"
+                >
+                  {{ guardando() === fila.rolAcceso ? 'Guardando…' : 'Guardar' }}
+                </button>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}
