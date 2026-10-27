@@ -1,0 +1,28 @@
+<dialog
+  #dialogo
+  aria-labelledby="confirm-titulo"
+  (cancel)="alCancelar($event)"
+  (close)="alCerrar()"
+>
+  <h2 id="confirm-titulo">{{ titulo() }}</h2>
+  @if (mensaje()) {
+    <p>{{ mensaje() }}</p>
+  }
+  @if (advertencias().length > 0) {
+    <ul class="alerta alerta-aviso">
+      @for (advertencia of advertencias(); track $index) {
+        <li>{{ advertencia }}</li>
+      }
+    </ul>
+  }
+  <div class="acciones">
+    <button type="button" (click)="cancelar.emit()">Cancelar</button>
+    <button
+      type="button"
+      [class]="peligro() ? 'btn-peligro' : 'btn-primario'"
+      (click)="confirmar.emit()"
+    >
+      {{ textoConfirmar() }}
+    </button>
+  </div>
+</dialog>

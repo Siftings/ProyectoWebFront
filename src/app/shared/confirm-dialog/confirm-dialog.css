@@ -1,0 +1,10 @@
+ul {
+  margin: 0 0 var(--space-4);
+  padding-left: var(--space-8);
+}
+
+.acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+}

@@ -4,11 +4,13 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { finalize } from 'rxjs';
 import { erroresFormulario } from '../../core/errors/problem-detail';
+import { AlertaError } from '../../shared/alerta-error/alerta-error';
+import { ErrorCampo } from '../../shared/error-campo/error-campo';
 import { InvitacionesService } from '../../core/services/invitaciones.service';
 import { UsuarioResponse } from '../../models/auth';
 
 @Component({
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, AlertaError, ErrorCampo],
   selector: 'app-invitacion',
   templateUrl: './invitacion.html',
 })

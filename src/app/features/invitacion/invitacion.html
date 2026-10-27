@@ -6,36 +6,30 @@
     <form [formGroup]="form" (ngSubmit)="enviar()" novalidate>
       <p>Elige tu nombre y una contraseña para crear tu cuenta.</p>
 
-      @if (error(); as mensaje) {
-        <p class="alerta alerta-error" role="alert">{{ mensaje }}</p>
-      }
+      <app-alerta-error [mensaje]="error()" />
 
       <div class="campo">
         <label for="nombre">Nombre</label>
         <input id="nombre" type="text" formControlName="nombre" autocomplete="name" />
-        @if (form.controls.nombre.touched && form.controls.nombre.invalid) {
-          <p class="error-campo">Ingresa tu nombre.</p>
-        }
-        @if (erroresCampo()['nombre']; as mensaje) {
-          <p class="error-campo">{{ mensaje }}</p>
-        }
+        <app-error-campo
+          [mostrar]="form.controls.nombre.touched && form.controls.nombre.invalid"
+          mensaje="Ingresa tu nombre."
+          [servidor]="erroresCampo()['nombre']"
+        />
       </div>
 
       <div class="campo">
         <label for="password">Contraseña</label>
         <input id="password" type="password" formControlName="password" autocomplete="new-password" />
-        @if (form.controls.password.touched && form.controls.password.invalid) {
-          <p class="error-campo">
-            {{
-              form.controls.password.hasError('required')
-                ? 'Ingresa una contraseña.'
-                : 'La contraseña debe tener al menos 8 caracteres.'
-            }}
-          </p>
-        }
-        @if (erroresCampo()['password']; as mensaje) {
-          <p class="error-campo">{{ mensaje }}</p>
-        }
+        <app-error-campo
+          [mostrar]="form.controls.password.touched && form.controls.password.invalid"
+          [mensaje]="
+            form.controls.password.hasError('required')
+              ? 'Ingresa una contraseña.'
+              : 'La contraseña debe tener al menos 8 caracteres.'
+          "
+          [servidor]="erroresCampo()['password']"
+        />
       </div>
 
       <button type="submit" class="btn-primario" [disabled]="enviando()">
