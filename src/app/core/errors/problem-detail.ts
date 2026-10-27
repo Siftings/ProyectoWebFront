@@ -9,6 +9,11 @@ export interface ProblemDetail {
   instance: string;
 }
 
+export interface ErroresFormulario {
+  mensaje: string | null;
+  campos: Record<string, string>;
+}
+
 const SIN_CONEXION = 'No se pudo conectar con el servidor.';
 const ERROR_GENERICO = 'Ocurrió un error inesperado. Intenta nuevamente más tarde.';
 
@@ -62,4 +67,10 @@ export function erroresPorCampo(problema: ProblemDetail): Record<string, string>
     errores[campo] = Object.hasOwn(errores, campo) ?`${errores[campo]} ${mensaje}` : mensaje;
   }
   return errores;
+}
+
+export function erroresFormulario(err: unknown): ErroresFormulario {
+  const problema = leerProblema(err);
+  const campos = problema ? erroresPorCampo(problema) : {};
+  return { mensaje: Object.keys(campos).length > 0 ? null : detalleError(err), campos };
 }

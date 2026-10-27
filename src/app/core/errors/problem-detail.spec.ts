@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { detalleError, erroresPorCampo, leerProblema, ProblemDetail } from './problem-detail';
+import { detalleError, erroresFormulario, erroresPorCampo, leerProblema, ProblemDetail } from './problem-detail';
 
 function problema(status: number, title: string, detail: string): ProblemDetail {
   return { type: 'about:blank', title, status, detail, instance: '/api/v1/procesos' };
@@ -83,6 +83,24 @@ describe('problem-detail', () => {
     it('ignora los trozos mal formados', () => {
       const p = problema(400, 'Validación fallida', 'sin separador; : sin campo; email: Email inválido.');
       expect(erroresPorCampo(p)).toEqual({ email: 'Email inválido.' });
+    });
+  });
+
+  describe('erroresFormulario', () => {
+    it('con errores de campo no repite el detail en el mensaje general', () => {
+      const p = problema(400, 'Validación fallida', 'nit: El NIT es obligatorio.');
+      expect(erroresFormulario(new HttpErrorResponse({ status: 400, error: p }))).toEqual({
+        mensaje: null,
+        campos: { nit: 'El NIT es obligatorio.' },
+      });
+    });
+
+    it('sin errores de campo devuelve el detail como mensaje', () => {
+      const p = problema(409, 'Regla de negocio violada', 'Ya existe una empresa.');
+      expect(erroresFormulario(new HttpErrorResponse({ status: 409, error: p }))).toEqual({
+        mensaje: 'Ya existe una empresa.',
+        campos: {},
+      });
     });
   });
 });
