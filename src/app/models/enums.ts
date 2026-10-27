@@ -43,3 +43,8 @@ export const ETIQUETAS_ROL_ACCESO: Record<RolAcceso, string> = {
   EDITOR: 'Editor',
   SOLO_LECTURA: 'Solo lectura',
 };
+
+export const ETIQUETAS_ESTADO_PROCESO: Record<EstadoProceso, string> = {
+  BORRADOR: 'Borrador',
+  PUBLICADO: 'Publicado',
+};
