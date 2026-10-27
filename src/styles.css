@@ -128,6 +128,16 @@ button:disabled {
   cursor: not-allowed;
 }
 
+.btn-enlace {
+  display: inline-block;
+  padding: var(--space-2) var(--space-4);
+  border: var(--border);
+  border-radius: var(--radius);
+  background: var(--color-bg);
+  color: var(--color-text);
+  text-decoration: none;
+}
+
 .btn-primario {
   border-color: var(--color-accent);
   background: var(--color-accent);
