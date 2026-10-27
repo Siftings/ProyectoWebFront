@@ -1,0 +1,66 @@
+<svg
+  class="dg-lienzo"
+  role="group"
+  aria-label="Diagrama del proceso"
+  [attr.width]="vista().ancho"
+  [attr.height]="vista().alto"
+  [attr.viewBox]="'0 0 ' + vista().ancho + ' ' + vista().alto"
+  (click)="seleccionar.emit(null)"
+>
+  <defs>
+    <marker
+      id="dg-flecha"
+      viewBox="0 0 10 10"
+      refX="10"
+      refY="5"
+      markerWidth="8"
+      markerHeight="8"
+      orient="auto"
+    >
+      <path class="dg-flecha" d="M 0 0 L 10 5 L 0 10 z" />
+    </marker>
+  </defs>
+
+  @for (p of vista().pools; track p.pool.id) {
+    <g
+      appPoolView
+      [pool]="p.pool"
+      [caja]="p.caja"
+      [sinLanes]="p.sinLanes"
+      [etiqueta]="'Pool ' + p.pool.nombre"
+      [seleccionado]="esSeleccion('pool', p.pool.id)"
+      (elegir)="seleccionar.emit({ tipo: 'pool', id: p.pool.id })"
+    />
+  }
+  @for (l of vista().lanes; track l.lane.id) {
+    <g
+      appLaneView
+      [lane]="l.lane"
+      [caja]="l.caja"
+      [etiqueta]="'Lane ' + l.lane.nombre"
+      [seleccionado]="esSeleccion('lane', l.lane.id)"
+      (elegir)="seleccionar.emit({ tipo: 'lane', id: l.lane.id })"
+    />
+  }
+  @for (a of vista().arcos; track a.arco.id) {
+    <g
+      appArcoView
+      [arco]="a.arco"
+      [desde]="a.desde"
+      [hasta]="a.hasta"
+      etiqueta="Arco"
+      [seleccionado]="esSeleccion('arco', a.arco.id)"
+      (elegir)="seleccionar.emit({ tipo: 'arco', id: a.arco.id })"
+    />
+  }
+  @for (n of vista().nodos; track n.nodo.id) {
+    <g
+      appNodoView
+      [nodo]="n.nodo"
+      [caja]="n.caja"
+      [etiqueta]="etiquetaNodo(n.nodo)"
+      [seleccionado]="esSeleccion('nodo', n.nodo.id)"
+      (elegir)="seleccionar.emit({ tipo: 'nodo', id: n.nodo.id })"
+    />
+  }
+</svg>

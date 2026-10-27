@@ -1,0 +1,89 @@
+.dg-lienzo {
+  display: block;
+  background: var(--color-bg);
+}
+
+.dg-lienzo text {
+  fill: var(--color-text);
+  font-family: inherit;
+  font-size: var(--text-sm);
+  user-select: none;
+}
+
+.dg-lienzo .dg-titulo {
+  font-weight: 600;
+}
+
+.dg-lienzo .dg-nota {
+  fill: var(--color-text-muted);
+}
+
+.dg-lienzo .dg-centrado {
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+.dg-lienzo .dg-simbolo {
+  font-weight: 600;
+}
+
+.dg-lienzo .dg-etiqueta {
+  paint-order: stroke;
+  stroke: var(--color-bg);
+  stroke-width: 4px;
+}
+
+.dg-forma {
+  fill: var(--color-bg);
+  stroke: var(--color-text-muted);
+  stroke-width: 1.5;
+}
+
+.dg-pool {
+  stroke: var(--color-text);
+}
+
+.dg-lane {
+  fill: none;
+  stroke: var(--color-border);
+  pointer-events: all;
+}
+
+.dg-arco {
+  fill: none;
+  stroke: var(--color-text);
+}
+
+.dg-arco-area {
+  stroke: transparent;
+  stroke-width: 12;
+  pointer-events: stroke;
+}
+
+.dg-flecha {
+  fill: var(--color-text);
+}
+
+.dg-throw {
+  fill: var(--color-text);
+}
+
+.dg-interno {
+  fill: none;
+  stroke: var(--color-text-muted);
+  stroke-width: 1.5;
+}
+
+.dg-elemento {
+  cursor: pointer;
+}
+
+.dg-elemento:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.dg-seleccionado > .dg-forma {
+  stroke: var(--color-accent);
+  stroke-width: 3;
+}
