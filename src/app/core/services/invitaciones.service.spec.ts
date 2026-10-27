@@ -43,6 +43,25 @@ describe('InvitacionesService', () => {
     expect(recibido).toEqual(RESPUESTA);
   });
 
+  it('crear hace POST con el cuerpo y devuelve la invitación', () => {
+    const invitacion = {
+      id: 1,
+      email: 'nuevo@demo.com',
+      rolAcceso: 'EDITOR' as const,
+      token: 'abc-123',
+      fechaExpiracion: '2026-10-29T10:00:00',
+    };
+    let recibida: unknown;
+    servicio.crear({ email: 'nuevo@demo.com', rolAcceso: 'EDITOR' }).subscribe((i) => (recibida = i));
+
+    const req = http.expectOne('http://api/usuarios/invitaciones');
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({ email: 'nuevo@demo.com', rolAcceso: 'EDITOR' });
+    req.flush(invitacion);
+
+    expect(recibida).toEqual(invitacion);
+  });
+
   it('codifica el token en la URL', () => {
     servicio.aceptar('a/b?c', { nombre: 'Nuevo', password: 'secreta123' }).subscribe();
     http.expectOne('http://api/usuarios/invitaciones/a%2Fb%3Fc/aceptar').flush(RESPUESTA);

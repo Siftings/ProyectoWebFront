@@ -8,4 +8,8 @@ export class UsuarioActualService {
   readonly rol = computed(() => this.usuario().rolAcceso);
   readonly esAdmin = computed(() => this.rol() === 'ADMINISTRADOR');
   readonly puedeEditar = computed(() => this.rol() === 'ADMINISTRADOR' || this.rol() === 'EDITOR');
+
+  esUsuarioActual(email: string): boolean {
+    return email.trim().toLowerCase() === this.usuario().email.trim().toLowerCase();
+  }
 }

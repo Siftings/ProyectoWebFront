@@ -30,6 +30,13 @@ describe('UsuarioActualService', () => {
     expect(servicio.puedeEditar()).toBe(true);
   });
 
+  it('esUsuarioActual compara el correo sin distinguir mayúsculas ni espacios', () => {
+    const servicio = crearServicio('ADMINISTRADOR');
+    expect(servicio.esUsuarioActual('a@demo.com')).toBe(true);
+    expect(servicio.esUsuarioActual(' A@Demo.com ')).toBe(true);
+    expect(servicio.esUsuarioActual('b@demo.com')).toBe(false);
+  });
+
   it('solo lectura no es admin ni puede editar', () => {
     const servicio = crearServicio('SOLO_LECTURA');
     expect(servicio.esAdmin()).toBe(false);

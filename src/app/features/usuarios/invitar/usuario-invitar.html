@@ -1,0 +1,45 @@
+<form class="tarjeta formulario" [formGroup]="form" (ngSubmit)="enviar()" novalidate>
+  <h1>Invitar usuario</h1>
+
+  @if (invitacion(); as datos) {
+    <p class="alerta alerta-exito" role="status">
+      Invitación creada para {{ datos.email }} ({{ etiquetasRol[datos.rolAcceso] }}). Expira el
+      {{ datos.fechaExpiracion | date: 'dd/MM/yyyy HH:mm' }}.
+    </p>
+    <div class="campo">
+      <label for="enlace">Enlace de invitación</label>
+      <input id="enlace" type="text" readonly [value]="enlace()" />
+    </div>
+    <p>
+      <button type="button" (click)="copiar()">Copiar</button>
+    </p>
+    @if (copiado()) {
+      <p role="status">{{ copiado() }}</p>
+    }
+  }
+  <app-alerta-error [mensaje]="error()" />
+
+  <div class="campo">
+    <label for="email">Correo</label>
+    <input id="email" type="email" formControlName="email" autocomplete="off" />
+    <app-error-campo
+      [mostrar]="form.controls.email.touched && form.controls.email.invalid"
+      [mensaje]="form.controls.email.hasError('required') ? 'Ingresa el correo.' : 'Ingresa un correo válido.'"
+      [servidor]="erroresCampo()['email']"
+    />
+  </div>
+
+  <div class="campo">
+    <label for="rolAcceso">Rol</label>
+    <select id="rolAcceso" formControlName="rolAcceso">
+      @for (rol of roles; track rol[0]) {
+        <option [value]="rol[0]">{{ rol[1] }}</option>
+      }
+    </select>
+  </div>
+
+  <button type="submit" class="btn-primario" [disabled]="enviando()">
+    {{ enviando() ? 'Invitando…' : 'Invitar' }}
+  </button>
+  <p><a routerLink="/usuarios">Volver a usuarios</a></p>
+</form>

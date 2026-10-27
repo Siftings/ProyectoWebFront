@@ -1,0 +1,70 @@
+<div class="encabezado">
+  <h1>Usuarios</h1>
+  <div class="acciones">
+    <a class="btn-enlace btn-primario" routerLink="/usuarios/nuevo">Nuevo usuario</a>
+    <a class="btn-enlace" routerLink="/usuarios/invitar">Invitar</a>
+  </div>
+</div>
+
+@if (aviso()) {
+  <p class="alerta alerta-exito" role="status">{{ aviso() }}</p>
+}
+<app-alerta-error [mensaje]="error()" />
+
+@if (cargando()) {
+  <p>Cargando…</p>
+}
+@if (lista(); as usuarios) {
+  @if (usuarios.length === 0) {
+    <p>No hay usuarios activos.</p>
+  } @else {
+    <div class="tabla">
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Correo</th>
+            <th>Rol</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (usuario of usuarios; track usuario.id) {
+            <tr>
+              <td>
+                {{ usuario.nombre }}
+                @if (actual.esUsuarioActual(usuario.email)) {
+                  (tú)
+                }
+              </td>
+              <td>{{ usuario.email }}</td>
+              <td>{{ etiquetasRol[usuario.rolAcceso] }}</td>
+              <td class="acciones">
+                @if (actual.esUsuarioActual(usuario.email)) {
+                  —
+                } @else {
+                  <a class="btn-enlace" [routerLink]="['/usuarios', usuario.id, 'editar']">Editar</a>
+                  <button type="button" class="btn-peligro" (click)="pendiente.set(usuario)">Desactivar</button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+}
+
+<app-confirm-dialog
+  [abierto]="pendiente() !== null"
+  titulo="Desactivar usuario"
+  [mensaje]="
+    pendiente()
+      ? 'Se desactivará a «' + pendiente()!.nombre + '» (' + pendiente()!.email + '). No podrá entrar a la aplicación.'
+      : ''
+  "
+  textoConfirmar="Desactivar"
+  [peligro]="true"
+  (confirmar)="confirmar()"
+  (cancelar)="pendiente.set(null)"
+/>
