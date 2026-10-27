@@ -71,6 +71,11 @@ export const routes: Routes = [
           import('./features/usuarios/editar/usuario-editar').then((m) => m.UsuarioEditar),
       },
       {
+        path: 'permisos',
+        loadComponent: () =>
+          import('./features/permisos/permisos-estructura').then((m) => m.PermisosEstructura),
+      },
+      {
         path: 'registro',
         loadComponent: () => import('./features/registro/registro').then((m) => m.Registro),
       },
