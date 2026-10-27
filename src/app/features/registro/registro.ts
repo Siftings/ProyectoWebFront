@@ -3,6 +3,8 @@ import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { finalize } from 'rxjs';
 import { erroresFormulario } from '../../core/errors/problem-detail';
+import { AlertaError } from '../../shared/alerta-error/alerta-error';
+import { ErrorCampo } from '../../shared/error-campo/error-campo';
 import { EmpresasService } from '../../core/services/empresas.service';
 import { RegistroEmpresaRequest } from '../../models/auth';
 
@@ -13,7 +15,7 @@ interface EmpresaCreada {
 }
 
 @Component({
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, AlertaError, ErrorCampo],
   selector: 'app-registro',
   styleUrl: './registro.css',
   templateUrl: './registro.html',
