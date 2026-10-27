@@ -1,0 +1,41 @@
+.encabezado {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.encabezado h1 {
+  margin: 0;
+}
+
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: flex-end;
+  margin-bottom: var(--space-4);
+}
+
+.filtros .campo {
+  flex: 1 1 10rem;
+  margin-bottom: 0;
+}
+
+.filtros .acciones-filtro {
+  display: flex;
+  flex: 0 0 auto;
+  gap: var(--space-2);
+}
+
+.tabla {
+  overflow-x: auto;
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}

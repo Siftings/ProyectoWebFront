@@ -1,0 +1,41 @@
+<div class="tarjeta formulario">
+  <h1>{{ id === null ? 'Nuevo rol' : 'Editar rol' }}</h1>
+
+  @if (!esAdmin()) {
+    <app-alerta-error mensaje="Solo el administrador puede gestionar roles de proceso." />
+  } @else {
+    @if (cargando()) {
+      <p>Cargando…</p>
+    }
+    <app-alerta-error [mensaje]="error()" />
+
+    @if (cargado()) {
+      <form [formGroup]="form" (ngSubmit)="enviar()" novalidate>
+        <div class="campo">
+          <label for="nombre">Nombre</label>
+          <input id="nombre" type="text" maxlength="255" formControlName="nombre" autocomplete="off" />
+          <app-error-campo
+            [mostrar]="form.controls.nombre.touched && form.controls.nombre.invalid"
+            mensaje="Ingresa el nombre del rol."
+            [servidor]="erroresCampo()['nombre']"
+          />
+        </div>
+
+        <div class="campo">
+          <label for="descripcion">Descripción (opcional)</label>
+          <textarea id="descripcion" rows="4" maxlength="255" formControlName="descripcion"></textarea>
+          <app-error-campo
+            [mostrar]="form.controls.descripcion.touched && form.controls.descripcion.invalid"
+            mensaje="La descripción admite hasta 255 caracteres."
+            [servidor]="erroresCampo()['descripcion']"
+          />
+        </div>
+
+        <button type="submit" class="btn-primario" [disabled]="enviando()">
+          {{ enviando() ? 'Guardando…' : 'Guardar' }}
+        </button>
+      </form>
+    }
+  }
+  <p><a routerLink="/roles">Cancelar</a></p>
+</div>
