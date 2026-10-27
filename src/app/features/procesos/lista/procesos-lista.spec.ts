@@ -127,6 +127,19 @@ describe('ProcesosLista', () => {
     expect(textos(fixture, 'td.acciones > *')).toEqual(['Editar', 'Publicar', 'Eliminar']);
   });
 
+  it('el nombre lleva al detalle y en Eliminados es texto plano', () => {
+    const fixture = crear('ADMINISTRADOR', { listar: () => of(pagina([proceso(1)])) });
+    const el: HTMLElement = fixture.nativeElement;
+    expect(el.querySelector('tbody td:first-child a')?.getAttribute('href')).toBe('/procesos/1');
+
+    fixture.componentInstance.form.controls.vista.setValue('eliminados');
+    fixture.componentInstance.buscar();
+    fixture.detectChanges();
+
+    expect(el.querySelector('tbody td:first-child a')).toBeNull();
+    expect(textos(fixture, 'tbody td:first-child')).toEqual(['Proceso 1']);
+  });
+
   it('pide la página anterior si la actual queda vacía', () => {
     const listar = vi.fn((_f: unknown, p: number) =>
       of(p === 1 ? pagina([], 1, 1) : pagina([proceso(1)], 0, 1)),
