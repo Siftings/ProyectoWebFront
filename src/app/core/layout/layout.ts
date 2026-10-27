@@ -16,6 +16,7 @@ const MENU: EnlaceMenu[] = [
   { texto: 'Roles de proceso', ruta: '/roles' },
   { texto: 'Usuarios', ruta: '/usuarios', roles: ['ADMINISTRADOR'] },
   { texto: 'Permisos', ruta: '/permisos', roles: ['ADMINISTRADOR'] },
+  { texto: 'Registrar empresa', ruta: '/registro' },
 ];
 
 @Component({

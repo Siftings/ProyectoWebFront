@@ -1,0 +1,108 @@
+<form class="tarjeta formulario" [formGroup]="form" (ngSubmit)="enviar()" novalidate>
+  <h1>Registrar empresa</h1>
+
+  @if (creada(); as empresa) {
+    <p class="alerta alerta-exito" role="status">
+      Empresa {{ empresa.nombre }} registrada (NIT {{ empresa.nit }}). Su administrador es {{ empresa.emailAdmin }}.
+    </p>
+  }
+  @if (error(); as mensaje) {
+    <p class="alerta alerta-error" role="alert">{{ mensaje }}</p>
+  }
+
+  <fieldset>
+    <legend>Empresa</legend>
+
+    <div class="campo">
+      <label for="nombreEmpresa">Nombre</label>
+      <input id="nombreEmpresa" type="text" formControlName="nombreEmpresa" autocomplete="organization" />
+      @if (form.controls.nombreEmpresa.touched && form.controls.nombreEmpresa.invalid) {
+        <p class="error-campo">Ingresa el nombre de la empresa.</p>
+      }
+      @if (erroresCampo()['nombreEmpresa']; as mensaje) {
+        <p class="error-campo">{{ mensaje }}</p>
+      }
+    </div>
+
+    <div class="campo">
+      <label for="nit">NIT</label>
+      <input id="nit" type="text" formControlName="nit" autocomplete="off" />
+      @if (form.controls.nit.touched && form.controls.nit.invalid) {
+        <p class="error-campo">Ingresa el NIT.</p>
+      }
+      @if (erroresCampo()['nit']; as mensaje) {
+        <p class="error-campo">{{ mensaje }}</p>
+      }
+    </div>
+
+    <div class="campo">
+      <label for="correoContacto">Correo de contacto</label>
+      <input id="correoContacto" type="email" formControlName="correoContacto" autocomplete="email" />
+      @if (form.controls.correoContacto.touched && form.controls.correoContacto.invalid) {
+        <p class="error-campo">
+          {{
+            form.controls.correoContacto.hasError('required')
+              ? 'Ingresa el correo de contacto.'
+              : 'Ingresa un correo válido.'
+          }}
+        </p>
+      }
+      @if (erroresCampo()['correoContacto']; as mensaje) {
+        <p class="error-campo">{{ mensaje }}</p>
+      }
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Administrador</legend>
+
+    <div class="campo">
+      <label for="nombreAdmin">Nombre</label>
+      <input id="nombreAdmin" type="text" formControlName="nombreAdmin" autocomplete="name" />
+      @if (form.controls.nombreAdmin.touched && form.controls.nombreAdmin.invalid) {
+        <p class="error-campo">Ingresa el nombre del administrador.</p>
+      }
+      @if (erroresCampo()['nombreAdmin']; as mensaje) {
+        <p class="error-campo">{{ mensaje }}</p>
+      }
+    </div>
+
+    <div class="campo">
+      <label for="emailAdmin">Correo</label>
+      <input id="emailAdmin" type="email" formControlName="emailAdmin" autocomplete="username" />
+      @if (form.controls.emailAdmin.touched && form.controls.emailAdmin.invalid) {
+        <p class="error-campo">
+          {{
+            form.controls.emailAdmin.hasError('required')
+              ? 'Ingresa el correo del administrador.'
+              : 'Ingresa un correo válido.'
+          }}
+        </p>
+      }
+      @if (erroresCampo()['emailAdmin']; as mensaje) {
+        <p class="error-campo">{{ mensaje }}</p>
+      }
+    </div>
+
+    <div class="campo">
+      <label for="passwordAdmin">Contraseña</label>
+      <input id="passwordAdmin" type="password" formControlName="passwordAdmin" autocomplete="new-password" />
+      @if (form.controls.passwordAdmin.touched && form.controls.passwordAdmin.invalid) {
+        <p class="error-campo">
+          {{
+            form.controls.passwordAdmin.hasError('required')
+              ? 'Ingresa una contraseña.'
+              : 'La contraseña debe tener al menos 8 caracteres.'
+          }}
+        </p>
+      }
+      @if (erroresCampo()['passwordAdmin']; as mensaje) {
+        <p class="error-campo">{{ mensaje }}</p>
+      }
+    </div>
+  </fieldset>
+
+  <button type="submit" class="btn-primario" [disabled]="enviando()">
+    {{ enviando() ? 'Registrando…' : 'Registrar' }}
+  </button>
+</form>
