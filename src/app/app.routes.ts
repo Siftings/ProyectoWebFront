@@ -23,6 +23,11 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'procesos/:id',
+        loadComponent: () =>
+          import('./features/procesos/detalle/proceso-detalle').then((m) => m.ProcesoDetalle),
+      },
+      {
         path: 'procesos/:id/editar',
         loadComponent: () =>
           import('./features/procesos/formulario/proceso-formulario').then(

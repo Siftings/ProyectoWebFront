@@ -63,7 +63,13 @@
         <tbody>
           @for (proceso of datos.content; track proceso.id) {
             <tr>
-              <td>{{ proceso.nombre }}</td>
+              <td>
+                @if (eliminados()) {
+                  {{ proceso.nombre }}
+                } @else {
+                  <a [routerLink]="['/procesos', proceso.id]">{{ proceso.nombre }}</a>
+                }
+              </td>
               <td>{{ proceso.categoria }}</td>
               <td><app-estado-badge [estado]="proceso.estado" /></td>
               <td>{{ proceso.fechaModificacion | date: 'dd/MM/yyyy HH:mm' }}</td>

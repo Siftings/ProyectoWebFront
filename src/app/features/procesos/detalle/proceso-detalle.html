@@ -1,0 +1,64 @@
+<p><a routerLink="/procesos">Volver a procesos</a></p>
+
+@if (cargando()) {
+  <p>Cargando…</p>
+}
+<app-alerta-error [mensaje]="error()" />
+
+@if (detalle(); as datos) {
+  <div class="encabezado">
+    <h1>{{ datos.proceso.nombre }}</h1>
+    <app-estado-badge [estado]="datos.proceso.estado" />
+  </div>
+
+  <div class="acciones">
+    @if (usuario.puedeEditar()) {
+      <a class="btn-enlace" [routerLink]="['/procesos', id, 'editar']">Editar datos</a>
+    }
+    <a class="btn-enlace btn-primario" [routerLink]="['/procesos', id, 'diagrama']">Diagrama</a>
+    <a class="btn-enlace" [routerLink]="['/procesos', id, 'compartir']">Compartir</a>
+  </div>
+
+  @if (datos.proceso.estado === 'PUBLICADO') {
+    <p class="alerta alerta-aviso">El proceso está publicado: el diagrama no se puede modificar.</p>
+  }
+
+  <div class="tarjeta">
+    <dl class="datos">
+      <dt>Descripción</dt>
+      <dd>{{ datos.proceso.descripcion }}</dd>
+      <dt>Categoría</dt>
+      <dd>{{ datos.proceso.categoria }}</dd>
+      <dt>Creado</dt>
+      <dd>{{ datos.proceso.fechaCreacion | date: 'dd/MM/yyyy HH:mm' }}</dd>
+      <dt>Modificado</dt>
+      <dd>{{ datos.proceso.fechaModificacion | date: 'dd/MM/yyyy HH:mm' }}</dd>
+    </dl>
+  </div>
+
+  <h2>Historial</h2>
+  @if (datos.historial.length === 0) {
+    <p>Sin cambios registrados.</p>
+  } @else {
+    <div class="tabla">
+      <table>
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Cambio</th>
+            <th>Autor</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (cambio of datos.historial; track cambio.id) {
+            <tr>
+              <td>{{ cambio.fechaCambio | date: 'dd/MM/yyyy HH:mm' }}</td>
+              <td>{{ cambio.descripcionCambio }}</td>
+              <td>{{ cambio.autorNombre }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+}
