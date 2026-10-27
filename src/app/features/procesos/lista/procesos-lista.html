@@ -1,0 +1,102 @@
+<div class="encabezado">
+  <h1>Procesos</h1>
+  @if (usuario.puedeEditar()) {
+    <a class="btn-enlace btn-primario" routerLink="/procesos/nuevo">Nuevo proceso</a>
+  }
+</div>
+
+<form class="filtros" [formGroup]="form" (ngSubmit)="buscar()">
+  <div class="campo">
+    <label for="filtro-nombre">Nombre</label>
+    <input id="filtro-nombre" type="text" formControlName="nombre" />
+  </div>
+  <div class="campo">
+    <label for="filtro-estado">Estado</label>
+    <select id="filtro-estado" formControlName="estado">
+      <option value="">Todos</option>
+      <option value="BORRADOR">{{ etiquetasEstado.BORRADOR }}</option>
+      <option value="PUBLICADO">{{ etiquetasEstado.PUBLICADO }}</option>
+    </select>
+  </div>
+  <div class="campo">
+    <label for="filtro-categoria">Categoría (exacta)</label>
+    <input id="filtro-categoria" type="text" formControlName="categoria" />
+  </div>
+  <div class="campo">
+    <label for="filtro-vista">Mostrar</label>
+    <select id="filtro-vista" formControlName="vista">
+      <option value="activos">Activos</option>
+      <option value="eliminados">Eliminados</option>
+    </select>
+  </div>
+  <div class="campo acciones-filtro">
+    <button type="submit" class="btn-primario">Buscar</button>
+    <button type="button" (click)="limpiar()">Limpiar</button>
+  </div>
+</form>
+
+@if (aviso()) {
+  <p class="alerta alerta-exito" role="status">{{ aviso() }}</p>
+}
+<app-alerta-error [mensaje]="error()" />
+
+@if (cargando()) {
+  <p>Cargando…</p>
+}
+@if (resultado(); as datos) {
+  @if (datos.content.length === 0) {
+    <p>No hay procesos que coincidan con los filtros.</p>
+  } @else {
+    <div class="tabla">
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Categoría</th>
+            <th>Estado</th>
+            <th>Modificado</th>
+            @if (!eliminados()) {
+              <th>Acciones</th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (proceso of datos.content; track proceso.id) {
+            <tr>
+              <td>{{ proceso.nombre }}</td>
+              <td>{{ proceso.categoria }}</td>
+              <td><app-estado-badge [estado]="proceso.estado" /></td>
+              <td>{{ proceso.fechaModificacion | date: 'dd/MM/yyyy HH:mm' }}</td>
+              @if (!eliminados()) {
+                <td class="acciones">
+                  @if (usuario.puedeEditar()) {
+                    <a class="btn-enlace" [routerLink]="['/procesos', proceso.id, 'editar']">Editar</a>
+                    @if (proceso.estado === 'BORRADOR') {
+                      <button type="button" (click)="pedir('publicar', proceso)">Publicar</button>
+                    }
+                  }
+                  @if (usuario.esAdmin()) {
+                    <button type="button" class="btn-peligro" (click)="pedir('eliminar', proceso)">
+                      Eliminar
+                    </button>
+                  }
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <app-paginador [pagina]="datos.page" [totalPaginas]="datos.totalPages" (cambiar)="cargar($event)" />
+  }
+}
+
+<app-confirm-dialog
+  [abierto]="pendiente() !== null"
+  [titulo]="textos().titulo"
+  [mensaje]="textos().mensaje"
+  [textoConfirmar]="textos().confirmar"
+  [peligro]="textos().peligro"
+  (confirmar)="confirmar()"
+  (cancelar)="pendiente.set(null)"
+/>
