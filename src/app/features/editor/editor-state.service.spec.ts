@@ -2,6 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
+import { ArcosService } from '../../core/services/arcos.service';
 import { LanesService } from '../../core/services/lanes.service';
 import { PermisosEstructuraService } from '../../core/services/permisos-estructura.service';
 import { NodosService } from '../../core/services/nodos.service';
@@ -66,6 +67,8 @@ describe('EditorStateService', () => {
   const editarNodoMock = vi.fn();
   const eliminarNodoMock = vi.fn();
   const impactoNodoMock = vi.fn();
+  const eliminarArcoMock = vi.fn();
+  const impactoArcoMock = vi.fn();
   let estado: EditorStateService;
 
   beforeEach(() => {
@@ -79,6 +82,8 @@ describe('EditorStateService', () => {
     editarNodoMock.mockReset();
     eliminarNodoMock.mockReset();
     impactoNodoMock.mockReset();
+    eliminarArcoMock.mockReset();
+    impactoArcoMock.mockReset();
     listarPermisosMock.mockReturnValue(of([]));
     TestBed.configureTestingModule({
       providers: [
@@ -92,6 +97,10 @@ describe('EditorStateService', () => {
             eliminar: eliminarNodoMock,
             impacto: impactoNodoMock,
           },
+        },
+        {
+          provide: ArcosService,
+          useValue: { eliminar: eliminarArcoMock, impacto: impactoArcoMock },
         },
         {
           provide: LanesService,
@@ -323,20 +332,20 @@ describe('EditorStateService', () => {
   });
 
   describe('nodos', () => {
-    it('puedeEliminarNodo es falso para un editor y con el proceso publicado', () => {
+    it('puedeEliminarFlujo es falso para un editor y con el proceso publicado', () => {
       diagramaMock.mockReturnValue(of(diagrama('BORRADOR')));
       estado.cargar(1);
       expect(estado.puedeModelar()).toBe(true);
-      expect(estado.puedeEliminarNodo()).toBe(true);
+      expect(estado.puedeEliminarFlujo()).toBe(true);
 
       rol.set('EDITOR');
-      expect(estado.puedeEliminarNodo()).toBe(false);
+      expect(estado.puedeEliminarFlujo()).toBe(false);
 
       rol.set('ADMINISTRADOR');
       diagramaMock.mockReturnValue(of(diagrama('PUBLICADO')));
       estado.cargar(1);
       expect(estado.puedeModelar()).toBe(false);
-      expect(estado.puedeEliminarNodo()).toBe(false);
+      expect(estado.puedeEliminarFlujo()).toBe(false);
     });
 
     it('moverNodo manda el PUT completo del nodo y recarga', () => {
@@ -408,6 +417,80 @@ describe('EditorStateService', () => {
       estado.nuevoNodo('evento', 11);
 
       expect(estado.creando()).toEqual({ tipo: 'nodo', kind: 'evento', laneId: 11 });
+    });
+  });
+
+  describe('arcos', () => {
+    beforeEach(() => {
+      diagramaMock.mockReturnValue(of(diagrama('BORRADOR')));
+      estado.cargar(1);
+    });
+
+    it('nuevoArco abre el alta con el origen y sin destino', () => {
+      estado.nuevoArco(100);
+
+      expect(estado.creando()).toEqual({ tipo: 'arco', origenId: 100, destinoId: null });
+      expect(estado.altaArco()?.origen.id).toBe(100);
+    });
+
+    it('en modo conexión, un nodo válido fija el destino y conserva la selección', () => {
+      estado.seleccionar({ tipo: 'nodo', id: 100 });
+      estado.nuevoArco(101);
+
+      estado.seleccionar({ tipo: 'nodo', id: 100 });
+
+      expect(estado.creando()).toEqual({ tipo: 'arco', origenId: 101, destinoId: 100 });
+      expect(estado.seleccion()).toEqual({ tipo: 'nodo', id: 100 });
+    });
+
+    it('en modo conexión, un nodo no válido o una lane cancelan el alta', () => {
+      estado.nuevoArco(100);
+      estado.seleccionar({ tipo: 'nodo', id: 101 });
+      expect(estado.creando()).toBeNull();
+
+      estado.nuevoArco(101);
+      estado.seleccionar({ tipo: 'lane', id: 11 });
+      expect(estado.creando()).toBeNull();
+      expect(estado.seleccion()).toEqual({ tipo: 'lane', id: 11 });
+    });
+
+    it('advertenciasArco entrega las advertencias del impacto', () => {
+      impactoArcoMock.mockReturnValue(
+        of({ requiereConfirmacion: true, rompeContinuidad: true, advertencias: ['Sin salida.'] }),
+      );
+      const alResolver = vi.fn();
+
+      estado.advertenciasArco(200, alResolver);
+
+      expect(impactoArcoMock).toHaveBeenCalledWith(200);
+      expect(alResolver).toHaveBeenCalledWith(['Sin salida.']);
+    });
+
+    it('eliminarArco llama al servicio, limpia la selección y recarga', () => {
+      eliminarArcoMock.mockReturnValue(of(undefined));
+      estado.seleccionar({ tipo: 'arco', id: 200 });
+
+      estado.eliminarArco(200);
+
+      expect(eliminarArcoMock).toHaveBeenCalledWith(200);
+      expect(estado.seleccion()).toBeNull();
+      expect(diagramaMock).toHaveBeenCalledTimes(2);
+    });
+
+    it('eliminarArco guarda el detail del error', () => {
+      eliminarArcoMock.mockReturnValue(
+        throwError(
+          () =>
+            new HttpErrorResponse({
+              status: 404,
+              error: { title: 'No encontrado', status: 404, detail: 'Arco no encontrado.' },
+            }),
+        ),
+      );
+
+      estado.eliminarArco(200);
+
+      expect(estado.errorAccion()).toBe('Arco no encontrado.');
     });
   });
 });

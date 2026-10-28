@@ -49,7 +49,7 @@
       [arco]="a.arco"
       [desde]="a.desde"
       [hasta]="a.hasta"
-      etiqueta="Arco"
+      [etiqueta]="etiquetaArco(a.arco)"
       [seleccionado]="esSeleccion('arco', a.arco.id)"
       (elegir)="seleccionar.emit({ tipo: 'arco', id: a.arco.id })"
     />

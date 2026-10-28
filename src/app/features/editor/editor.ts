@@ -10,6 +10,7 @@ import { DiagramaCanvas } from '../../shared/diagrama/diagrama-canvas';
 import { Punto } from '../../shared/diagrama/diagrama-layout';
 import { EstadoBadge } from '../../shared/estado-badge/estado-badge';
 import { ActividadFormulario } from './actividad-formulario';
+import { ArcoFormulario } from './arco-formulario';
 import { EditorStateService } from './editor-state.service';
 import { EventoFormulario } from './evento-formulario';
 import { GatewayFormulario } from './gateway-formulario';
@@ -19,7 +20,8 @@ import { PoolFormulario } from './pool-formulario';
 
 type Pendiente =
   | { tipo: 'pool' | 'lane'; id: number; nombre: string }
-  | { tipo: 'nodo'; id: number; nombre: string; kind: KindNodo; advertencias: string[] };
+  | { tipo: 'nodo'; id: number; nombre: string; kind: KindNodo; advertencias: string[] }
+  | { tipo: 'arco'; id: number; nombre: string; advertencias: string[] };
 
 @Component({
   imports: [
@@ -31,6 +33,7 @@ type Pendiente =
     PoolFormulario,
     LaneFormulario,
     ActividadFormulario,
+    ArcoFormulario,
     GatewayFormulario,
     EventoFormulario,
   ],
@@ -50,7 +53,7 @@ export class Editor {
   protected readonly pendiente = signal<Pendiente | null>(null);
   protected readonly advertencias = computed(() => {
     const p = this.pendiente();
-    return p?.tipo === 'nodo' ? p.advertencias : [];
+    return p?.tipo === 'nodo' || p?.tipo === 'arco' ? p.advertencias : [];
   });
   protected readonly textos = computed(() => {
     const p = this.pendiente();
@@ -64,6 +67,11 @@ export class Editor {
         return {
           titulo: `Eliminar "${p.nombre}"`,
           mensaje: 'También se desactivan sus arcos. Esta acción no se puede deshacer.',
+        };
+      case 'arco':
+        return {
+          titulo: `Eliminar el arco ${p.nombre}`,
+          mensaje: 'Esta acción no se puede deshacer.',
         };
       default:
         return {
@@ -109,6 +117,12 @@ export class Editor {
     );
   }
 
+  protected pedirEliminarArco(id: number, origen: string, destino: string): void {
+    this.estado.advertenciasArco(id, (advertencias) =>
+      this.pendiente.set({ tipo: 'arco', id, nombre: `de ${origen} a ${destino}`, advertencias }),
+    );
+  }
+
   protected confirmarEliminar(): void {
     const p = this.pendiente();
     this.pendiente.set(null);
@@ -117,6 +131,8 @@ export class Editor {
     }
     if (p.tipo === 'nodo') {
       this.estado.eliminarNodo(p.kind, p.id);
+    } else if (p.tipo === 'arco') {
+      this.estado.eliminarArco(p.id);
     } else {
       this.estado.eliminar(p.tipo, p.id);
     }

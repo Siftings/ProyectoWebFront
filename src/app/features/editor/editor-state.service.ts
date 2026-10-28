@@ -3,6 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Observable, Subject, catchError, finalize, map, of, switchMap, tap } from 'rxjs';
 import { detalleError } from '../../core/errors/problem-detail';
+import { ArcosService } from '../../core/services/arcos.service';
 import { LanesService } from '../../core/services/lanes.service';
 import { PermisosEstructuraService } from '../../core/services/permisos-estructura.service';
 import { KindNodo, NodosService } from '../../core/services/nodos.service';
@@ -15,6 +16,7 @@ import { ProcesoDiagramaResponse } from '../../models/proceso';
 import { LaneResponse, PoolResponse } from '../../models/pool-lane';
 import { MovimientoNodo } from '../../shared/diagrama/arrastre';
 import { NodoDiagrama, Seleccion, armarArbol } from '../../shared/diagrama/diagrama-arbol';
+import { destinosPosibles } from './arcos-editor';
 import { requestPosicion } from './nodos-editor';
 import { moverLane as nuevoOrden } from './orden-lanes';
 import { permisosEditor } from './permisos-editor';
@@ -23,12 +25,19 @@ export type ElementoSeleccionado =
   | { tipo: 'pool'; pool: PoolResponse }
   | { tipo: 'lane'; lane: LaneResponse }
   | { tipo: 'nodo'; nodo: NodoDiagrama }
-  | { tipo: 'arco'; arco: ArcoResponse; origen: string; destino: string };
+  | {
+      tipo: 'arco';
+      arco: ArcoResponse;
+      origen: string;
+      destino: string;
+      origenNodo: NodoDiagrama | undefined;
+    };
 
 export type Creando =
   | { tipo: 'pool' }
   | { tipo: 'lane'; poolId: number }
   | { tipo: 'nodo'; kind: KindNodo; laneId: number }
+  | { tipo: 'arco'; origenId: number; destinoId: number | null }
   | null;
 
 @Injectable()
@@ -37,6 +46,7 @@ export class EditorStateService {
   private readonly pools = inject(PoolsService);
   private readonly lanes = inject(LanesService);
   private readonly nodos = inject(NodosService);
+  private readonly arcos = inject(ArcosService);
   private readonly permisosApi = inject(PermisosEstructuraService);
   private readonly usuario = inject(UsuarioActualService);
   private readonly peticiones = new Subject<{ id: number; limpiar: boolean }>();
@@ -70,7 +80,21 @@ export class EditorStateService {
 
   readonly puedeModelar = computed(() => !this.soloLectura());
 
-  readonly puedeEliminarNodo = computed(() => this.puedeModelar() && this.usuario.esAdmin());
+  readonly puedeEliminarFlujo = computed(() => this.puedeModelar() && this.usuario.esAdmin());
+
+  readonly altaArco = computed(() => {
+    const c = this.creando();
+    if (c?.tipo !== 'arco') {
+      return null;
+    }
+    const arbol = this.arbol();
+    const origen = arbol
+      .flatMap((p) => p.lanes.flatMap((l) => l.nodos))
+      .find((n) => n.id === c.origenId);
+    return origen
+      ? { origen, destinos: destinosPosibles(arbol, c.origenId), destinoId: c.destinoId }
+      : null;
+  });
 
   readonly seleccionado = computed<ElementoSeleccionado | null>(() => {
     const s = this.seleccion();
@@ -103,6 +127,7 @@ export class EditorStateService {
           arco,
           origen: nombre(arco.origenId),
           destino: nombre(arco.destinoId),
+          origenNodo: nodos.find((n) => n.id === arco.origenId),
         };
       }
     }
@@ -154,6 +179,13 @@ export class EditorStateService {
   }
 
   seleccionar(s: Seleccion): void {
+    const c = this.creando();
+    if (c?.tipo === 'arco' && s?.tipo === 'nodo') {
+      if (this.altaArco()?.destinos.some((n) => n.id === s.id)) {
+        this.creando.set({ ...c, destinoId: s.id });
+        return;
+      }
+    }
     this.creando.set(null);
     this.errorAccion.set(null);
     this.seleccion.set(s);
@@ -173,6 +205,11 @@ export class EditorStateService {
   nuevoNodo(kind: KindNodo, laneId: number): void {
     this.errorAccion.set(null);
     this.creando.set({ tipo: 'nodo', kind, laneId });
+  }
+
+  nuevoArco(origenId: number): void {
+    this.errorAccion.set(null);
+    this.creando.set({ tipo: 'arco', origenId, destinoId: null });
   }
 
   cancelarCreacion(): void {
@@ -284,6 +321,39 @@ export class EditorStateService {
     this.ocupado.set(true);
     this.nodos
       .eliminar(kind, id)
+      .pipe(finalize(() => this.ocupado.set(false)))
+      .subscribe({
+        next: () => {
+          this.seleccion.set(null);
+          this.recargar();
+        },
+        error: (err: unknown) => this.errorAccion.set(detalleError(err)),
+      });
+  }
+
+  advertenciasArco(id: number, alResolver: (a: string[]) => void): void {
+    if (this.ocupado()) {
+      return;
+    }
+    this.errorAccion.set(null);
+    this.ocupado.set(true);
+    this.arcos
+      .impacto(id)
+      .pipe(finalize(() => this.ocupado.set(false)))
+      .subscribe({
+        next: (impacto) => alResolver(impacto.advertencias),
+        error: (err: unknown) => this.errorAccion.set(detalleError(err)),
+      });
+  }
+
+  eliminarArco(id: number): void {
+    if (this.ocupado()) {
+      return;
+    }
+    this.errorAccion.set(null);
+    this.ocupado.set(true);
+    this.arcos
+      .eliminar(id)
       .pipe(finalize(() => this.ocupado.set(false)))
       .subscribe({
         next: () => {
