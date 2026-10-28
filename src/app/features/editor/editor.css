@@ -10,6 +10,17 @@
   margin: 0;
 }
 
+.barra {
+  margin-bottom: var(--space-3);
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
 .cuerpo {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 20rem;
