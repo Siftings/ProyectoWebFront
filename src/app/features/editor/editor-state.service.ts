@@ -1,10 +1,11 @@
 // Estado del editor de un proceso: diagrama cargado, árbol, selección y si es de solo lectura.
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { Subject, catchError, finalize, map, of, switchMap, tap } from 'rxjs';
+import { Observable, Subject, catchError, finalize, map, of, switchMap, tap } from 'rxjs';
 import { detalleError } from '../../core/errors/problem-detail';
 import { LanesService } from '../../core/services/lanes.service';
 import { PermisosEstructuraService } from '../../core/services/permisos-estructura.service';
+import { KindNodo, NodosService } from '../../core/services/nodos.service';
 import { PoolsService } from '../../core/services/pools.service';
 import { ProcesosService } from '../../core/services/procesos.service';
 import { UsuarioActualService } from '../../core/services/usuario-actual.service';
@@ -12,7 +13,9 @@ import { ArcoResponse } from '../../models/arco';
 import { PermisoEstructuraResponse } from '../../models/permisos';
 import { ProcesoDiagramaResponse } from '../../models/proceso';
 import { LaneResponse, PoolResponse } from '../../models/pool-lane';
+import { MovimientoNodo } from '../../shared/diagrama/arrastre';
 import { NodoDiagrama, Seleccion, armarArbol } from '../../shared/diagrama/diagrama-arbol';
+import { requestPosicion } from './nodos-editor';
 import { moverLane as nuevoOrden } from './orden-lanes';
 import { permisosEditor } from './permisos-editor';
 
@@ -22,13 +25,18 @@ export type ElementoSeleccionado =
   | { tipo: 'nodo'; nodo: NodoDiagrama }
   | { tipo: 'arco'; arco: ArcoResponse; origen: string; destino: string };
 
-export type Creando = { tipo: 'pool' } | { tipo: 'lane'; poolId: number } | null;
+export type Creando =
+  | { tipo: 'pool' }
+  | { tipo: 'lane'; poolId: number }
+  | { tipo: 'nodo'; kind: KindNodo; laneId: number }
+  | null;
 
 @Injectable()
 export class EditorStateService {
   private readonly procesos = inject(ProcesosService);
   private readonly pools = inject(PoolsService);
   private readonly lanes = inject(LanesService);
+  private readonly nodos = inject(NodosService);
   private readonly permisosApi = inject(PermisosEstructuraService);
   private readonly usuario = inject(UsuarioActualService);
   private readonly peticiones = new Subject<{ id: number; limpiar: boolean }>();
@@ -59,6 +67,10 @@ export class EditorStateService {
   readonly permisos = computed(() =>
     permisosEditor(this.usuario.rol(), this.filasPermisos(), this.soloLectura()),
   );
+
+  readonly puedeModelar = computed(() => !this.soloLectura());
+
+  readonly puedeEliminarNodo = computed(() => this.puedeModelar() && this.usuario.esAdmin());
 
   readonly seleccionado = computed<ElementoSeleccionado | null>(() => {
     const s = this.seleccion();
@@ -158,6 +170,11 @@ export class EditorStateService {
     this.creando.set({ tipo: 'lane', poolId });
   }
 
+  nuevoNodo(kind: KindNodo, laneId: number): void {
+    this.errorAccion.set(null);
+    this.creando.set({ tipo: 'nodo', kind, laneId });
+  }
+
   cancelarCreacion(): void {
     this.creando.set(null);
   }
@@ -206,5 +223,74 @@ export class EditorStateService {
       },
       error: (err: unknown) => this.errorAccion.set(detalleError(err)),
     });
+  }
+
+  moverNodo({ id, posicionX, posicionY }: MovimientoNodo): void {
+    const nodo = this.arbol()
+      .flatMap((p) => p.lanes.flatMap((l) => l.nodos))
+      .find((n) => n.id === id);
+    if (!nodo || this.ocupado()) {
+      this.recargar();
+      return;
+    }
+    const peticion = requestPosicion(nodo, posicionX, posicionY);
+    this.errorAccion.set(null);
+    this.ocupado.set(true);
+    let guardar: Observable<unknown>;
+    switch (peticion.kind) {
+      case 'actividad':
+        guardar = this.nodos.editar('actividad', id, peticion.req);
+        break;
+      case 'gateway':
+        guardar = this.nodos.editar('gateway', id, peticion.req);
+        break;
+      case 'evento':
+        guardar = this.nodos.editar('evento', id, peticion.req);
+        break;
+    }
+    guardar.pipe(finalize(() => this.ocupado.set(false))).subscribe({
+      next: () => this.recargar(),
+      error: (err: unknown) => {
+        this.errorAccion.set(detalleError(err));
+        this.recargar();
+      },
+    });
+  }
+
+  advertenciasNodo(
+    kind: 'actividad' | 'gateway',
+    id: number,
+    alResolver: (a: string[]) => void,
+  ): void {
+    if (this.ocupado()) {
+      return;
+    }
+    this.errorAccion.set(null);
+    this.ocupado.set(true);
+    this.nodos
+      .impacto(kind, id)
+      .pipe(finalize(() => this.ocupado.set(false)))
+      .subscribe({
+        next: (impacto) => alResolver(impacto.advertencias),
+        error: (err: unknown) => this.errorAccion.set(detalleError(err)),
+      });
+  }
+
+  eliminarNodo(kind: KindNodo, id: number): void {
+    if (this.ocupado()) {
+      return;
+    }
+    this.errorAccion.set(null);
+    this.ocupado.set(true);
+    this.nodos
+      .eliminar(kind, id)
+      .pipe(finalize(() => this.ocupado.set(false)))
+      .subscribe({
+        next: () => {
+          this.seleccion.set(null);
+          this.recargar();
+        },
+        error: (err: unknown) => this.errorAccion.set(detalleError(err)),
+      });
   }
 }

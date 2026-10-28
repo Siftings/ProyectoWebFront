@@ -1,0 +1,50 @@
+<form class="formulario" [formGroup]="form" (ngSubmit)="enviar()" novalidate>
+  <app-alerta-error [mensaje]="error()" />
+
+  <div class="campo">
+    <label for="gw-nombre">Nombre</label>
+    <input id="gw-nombre" type="text" maxlength="255" formControlName="nombre" autocomplete="off" />
+    <app-error-campo
+      [mostrar]="form.controls.nombre.touched && form.controls.nombre.invalid"
+      mensaje="Ingresa el nombre del gateway."
+      [servidor]="erroresCampo()['nombre']"
+    />
+  </div>
+
+  <div class="campo">
+    <label for="gw-tipo">Tipo</label>
+    <select id="gw-tipo" formControlName="tipoGateway">
+      @for (t of tipos; track t[0]) {
+        <option [value]="t[0]">{{ t[1] }}</option>
+      }
+    </select>
+    <app-error-campo [mostrar]="false" mensaje="" [servidor]="erroresCampo()['tipoGateway']" />
+  </div>
+
+  <div class="campo">
+    <label for="gw-x">Posición X</label>
+    <input id="gw-x" type="number" min="0" step="1" formControlName="posicionX" />
+    <app-error-campo
+      [mostrar]="form.controls.posicionX.touched && form.controls.posicionX.invalid"
+      mensaje="Ingresa un número entero de 0 o más."
+      [servidor]="erroresCampo()['posicionX']"
+    />
+  </div>
+
+  <div class="campo">
+    <label for="gw-y">Posición Y</label>
+    <input id="gw-y" type="number" min="0" step="1" formControlName="posicionY" />
+    <app-error-campo
+      [mostrar]="form.controls.posicionY.touched && form.controls.posicionY.invalid"
+      mensaje="Ingresa un número entero de 0 o más."
+      [servidor]="erroresCampo()['posicionY']"
+    />
+  </div>
+
+  <button type="submit" class="btn-primario" [disabled]="enviando()">
+    {{ enviando() ? 'Guardando…' : 'Guardar' }}
+  </button>
+  @if (!gateway()) {
+    <button type="button" (click)="cancelar.emit()">Cancelar</button>
+  }
+</form>

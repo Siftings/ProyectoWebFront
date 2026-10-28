@@ -29,7 +29,9 @@
         <app-diagrama-canvas
           [arbol]="estado.arbol()"
           [seleccion]="estado.seleccion()"
+          [arrastrable]="estado.puedeModelar()"
           (seleccionar)="estado.seleccionar($event)"
+          (mover)="estado.moverNodo($event)"
         />
       }
     </div>
@@ -44,11 +46,35 @@
             (guardado)="estado.guardado({ tipo: 'pool', id: $event })"
             (cancelar)="estado.cancelarCreacion()"
           />
-        } @else {
+        } @else if (c.tipo === 'lane') {
           <h2>Nueva lane</h2>
           <app-lane-formulario
             [poolId]="c.poolId"
             (guardado)="estado.guardado({ tipo: 'lane', id: $event })"
+            (cancelar)="estado.cancelarCreacion()"
+          />
+        } @else if (c.kind === 'actividad') {
+          <h2>Nueva actividad</h2>
+          <app-actividad-formulario
+            [laneId]="c.laneId"
+            [posicionInicial]="posicionAlta(c.laneId)"
+            (guardado)="estado.guardado({ tipo: 'nodo', id: $event })"
+            (cancelar)="estado.cancelarCreacion()"
+          />
+        } @else if (c.kind === 'gateway') {
+          <h2>Nuevo gateway</h2>
+          <app-gateway-formulario
+            [laneId]="c.laneId"
+            [posicionInicial]="posicionAlta(c.laneId)"
+            (guardado)="estado.guardado({ tipo: 'nodo', id: $event })"
+            (cancelar)="estado.cancelarCreacion()"
+          />
+        } @else {
+          <h2>Nuevo evento</h2>
+          <app-evento-formulario
+            [laneId]="c.laneId"
+            [posicionInicial]="posicionAlta(c.laneId)"
+            (guardado)="estado.guardado({ tipo: 'nodo', id: $event })"
             (cancelar)="estado.cancelarCreacion()"
           />
         }
@@ -67,6 +93,30 @@
               [lane]="s.lane"
               (guardado)="estado.guardado({ tipo: 'lane', id: $event })"
             />
+          } @else if (s.tipo === 'nodo' && estado.puedeModelar()) {
+            @switch (s.nodo.kind) {
+              @case ('actividad') {
+                <app-actividad-formulario
+                  [laneId]="s.nodo.laneId"
+                  [actividad]="s.nodo"
+                  (guardado)="estado.guardado({ tipo: 'nodo', id: $event })"
+                />
+              }
+              @case ('gateway') {
+                <app-gateway-formulario
+                  [laneId]="s.nodo.laneId"
+                  [gateway]="s.nodo"
+                  (guardado)="estado.guardado({ tipo: 'nodo', id: $event })"
+                />
+              }
+              @case ('evento') {
+                <app-evento-formulario
+                  [laneId]="s.nodo.laneId"
+                  [evento]="s.nodo"
+                  (guardado)="estado.guardado({ tipo: 'nodo', id: $event })"
+                />
+              }
+            }
           } @else {
             <dl class="datos">
               @if (s.tipo === 'pool') {
@@ -142,9 +192,23 @@
               }
             </div>
           } @else if (
-            s.tipo === 'lane' && (estado.permisos().editarLane || estado.permisos().eliminarLane)
+            s.tipo === 'lane' &&
+            (estado.puedeModelar() ||
+              estado.permisos().editarLane ||
+              estado.permisos().eliminarLane)
           ) {
             <div class="acciones">
+              @if (estado.puedeModelar()) {
+                <button type="button" (click)="estado.nuevoNodo('actividad', s.lane.id)">
+                  Agregar actividad
+                </button>
+                <button type="button" (click)="estado.nuevoNodo('gateway', s.lane.id)">
+                  Agregar gateway
+                </button>
+                <button type="button" (click)="estado.nuevoNodo('evento', s.lane.id)">
+                  Agregar evento
+                </button>
+              }
               @if (estado.permisos().editarLane) {
                 <button
                   type="button"
@@ -172,6 +236,14 @@
               }
             </div>
           }
+
+          @if (s.tipo === 'nodo' && estado.puedeEliminarNodo()) {
+            <div class="acciones">
+              <button type="button" class="btn-peligro" (click)="pedirEliminarNodo(s.nodo)">
+                Eliminar {{ tipoNodo(s.nodo).toLowerCase() }}
+              </button>
+            </div>
+          }
         } @else {
           <p>Selecciona un elemento del diagrama.</p>
         }
@@ -185,6 +257,7 @@
   [titulo]="textos().titulo"
   [mensaje]="textos().mensaje"
   textoConfirmar="Eliminar"
+  [advertencias]="advertencias()"
   [peligro]="true"
   (confirmar)="confirmarEliminar()"
   (cancelar)="pendiente.set(null)"
