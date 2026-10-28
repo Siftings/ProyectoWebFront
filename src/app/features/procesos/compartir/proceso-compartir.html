@@ -1,0 +1,84 @@
+<p><a [routerLink]="['/procesos', id]">Volver al proceso</a></p>
+
+<div class="encabezado">
+  <h1>Compartir{{ proceso() ? ': ' + proceso()!.nombre : '' }}</h1>
+</div>
+
+@if (aviso()) {
+  <p class="alerta alerta-exito" role="status">{{ aviso() }}</p>
+}
+<app-alerta-error [mensaje]="error()" />
+
+<h2>Empresas con acceso</h2>
+@if (lista(); as filas) {
+  @if (filas.length === 0) {
+    <p>El proceso no se ha compartido con ninguna empresa.</p>
+  } @else {
+    <div class="tabla">
+      <table>
+        <thead>
+          <tr>
+            <th>Empresa</th>
+            @if (usuario.esAdmin()) {
+              <th>Acciones</th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (fila of filas; track fila.id) {
+            <tr>
+              <td>{{ fila.empresaInvitada }}</td>
+              @if (usuario.esAdmin()) {
+                <td class="acciones">
+                  <button type="button" class="btn-peligro" (click)="pendiente.set(fila)">Revocar</button>
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+} @else if (!error()) {
+  <p>Cargando…</p>
+}
+
+@if (usuario.esAdmin()) {
+  <section class="tarjeta compartir">
+    <h2>Compartir con otra empresa</h2>
+    <form class="busqueda" [formGroup]="form" (ngSubmit)="buscar()" novalidate>
+      <div class="campo">
+        <label for="nit">NIT de la empresa</label>
+        <input id="nit" type="text" formControlName="nit" autocomplete="off" (input)="nitCambiado()" />
+        <app-error-campo
+          [mostrar]="form.controls.nit.touched && form.controls.nit.invalid"
+          mensaje="Ingresa el NIT de la empresa."
+        />
+      </div>
+      <button type="submit" class="btn-primario" [disabled]="buscando()">
+        {{ buscando() ? 'Buscando…' : 'Buscar' }}
+      </button>
+    </form>
+    <app-alerta-error [mensaje]="errorFormulario()" />
+
+    @if (empresa(); as encontrada) {
+      <p role="status">Empresa encontrada: {{ encontrada.nombre }}</p>
+      <div class="acciones">
+        <button type="button" class="btn-primario" [disabled]="compartiendo()" (click)="compartir()">
+          {{ compartiendo() ? 'Compartiendo…' : 'Compartir con ' + encontrada.nombre }}
+        </button>
+        <button type="button" (click)="cancelarBusqueda()">Cancelar</button>
+      </div>
+    }
+  </section>
+}
+
+<app-confirm-dialog
+  [abierto]="pendiente() !== null"
+  titulo="Revocar acceso"
+  [mensaje]="pendiente() ? pendiente()!.empresaInvitada + ' dejará de ver este proceso.' : ''"
+  textoConfirmar="Revocar"
+  [peligro]="true"
+  (confirmar)="revocar()"
+  (cancelar)="pendiente.set(null)"
+/>

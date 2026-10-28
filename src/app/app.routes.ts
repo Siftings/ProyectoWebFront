@@ -39,6 +39,21 @@ export const routes: Routes = [
         loadComponent: () => import('./features/editor/editor').then((m) => m.Editor),
       },
       {
+        path: 'procesos/:id/compartir',
+        loadComponent: () =>
+          import('./features/procesos/compartir/proceso-compartir').then((m) => m.ProcesoCompartir),
+      },
+      {
+        path: 'compartidos',
+        loadComponent: () =>
+          import('./features/compartidos/lista/compartidos-lista').then((m) => m.CompartidosLista),
+      },
+      {
+        path: 'compartidos/:id',
+        loadComponent: () =>
+          import('./features/compartidos/visor/compartido-visor').then((m) => m.CompartidoVisor),
+      },
+      {
         path: 'roles',
         loadComponent: () => import('./features/roles/lista/roles-lista').then((m) => m.RolesLista),
       },

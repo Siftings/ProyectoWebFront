@@ -1,0 +1,48 @@
+.encabezado {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+  margin-bottom: var(--space-3);
+}
+
+.encabezado h1 {
+  margin: 0;
+}
+
+.tabla {
+  overflow-x: auto;
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.compartir {
+  margin-top: var(--space-4);
+}
+
+.busqueda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: flex-start;
+  margin-bottom: var(--space-3);
+}
+
+.busqueda .campo {
+  flex: 1 1 14rem;
+  margin-bottom: 0;
+}
+
+.busqueda button {
+  margin-top: 1.75rem;
+}
+
+@media (max-width: 30rem) {
+  .busqueda button {
+    margin-top: 0;
+  }
+}
