@@ -28,6 +28,7 @@
       } @else {
         <app-diagrama-canvas
           [arbol]="estado.arbol()"
+          [mensajes]="estado.mensajes()"
           [seleccion]="estado.seleccion()"
           [arrastrable]="estado.puedeModelar()"
           (seleccionar)="estado.seleccionar($event)"
@@ -62,6 +63,23 @@
               [destinos]="alta.destinos"
               [destinoId]="alta.destinoId"
               (guardado)="estado.guardado({ tipo: 'arco', id: $event })"
+              (cancelar)="estado.cancelarCreacion()"
+            />
+          }
+        } @else if (c.tipo === 'mensaje') {
+          <h2>Nuevo mensaje</h2>
+          @if (estado.altaMensaje(); as alta) {
+            <p>
+              Envío: {{ alta.origen.nombre }}. Elige el receptor en el diagrama o en la lista. El
+              nombre y la clave de correlación son los del envío.
+            </p>
+            <app-mensaje-formulario
+              [procesoId]="id"
+              [arbol]="estado.arbol()"
+              [origen]="alta.origen"
+              [candidatos]="alta.candidatos"
+              [catchId]="alta.catchId"
+              (guardado)="estado.guardado({ tipo: 'mensaje', id: $event })"
               (cancelar)="estado.cancelarCreacion()"
             />
           }
@@ -136,6 +154,16 @@
               [arco]="s.arco"
               (guardado)="estado.guardado({ tipo: 'arco', id: $event })"
             />
+          } @else if (s.tipo === 'mensaje' && estado.puedeModelar()) {
+            <p>
+              Mensaje de {{ s.poolOrigen }} a {{ s.poolDestino }}. El nombre y la clave siguen a los
+              eventos: para cambiarlos edita los eventos.
+            </p>
+            <app-mensaje-formulario
+              [procesoId]="id"
+              [mensaje]="s.mensaje"
+              (guardado)="estado.guardado({ tipo: 'mensaje', id: $event })"
+            />
           } @else {
             <dl class="datos">
               @if (s.tipo === 'pool') {
@@ -176,6 +204,25 @@
                 @if (s.nodo.kind === 'evento') {
                   <dt>Clave de correlación</dt>
                   <dd>{{ s.nodo.claveCorrelacion }}</dd>
+                }
+              } @else if (s.tipo === 'mensaje') {
+                <dt>Elemento</dt>
+                <dd>Mensaje</dd>
+                <dt>Nombre</dt>
+                <dd>{{ s.mensaje.nombre }}</dd>
+                <dt>Origen</dt>
+                <dd>{{ s.poolOrigen }}</dd>
+                <dt>Destino</dt>
+                <dd>{{ s.poolDestino }}</dd>
+                <dt>Contenido</dt>
+                <dd>{{ s.mensaje.contenido }}</dd>
+                <dt>Clave de correlación</dt>
+                <dd>{{ s.mensaje.claveCorrelacion || 'Sin clave' }}</dd>
+                <dt>Sin caso</dt>
+                <dd>{{ politicas[s.mensaje.politicaSinCaso] }}</dd>
+                @if (s.mensaje.sinReceptor) {
+                  <dt>Receptor</dt>
+                  <dd>Sin receptor: no se podrá publicar</dd>
                 }
               } @else {
                 <dt>Elemento</dt>
@@ -260,6 +307,11 @@
             <div class="acciones">
               @if (estado.puedeModelar()) {
                 <button type="button" (click)="estado.nuevoArco(s.nodo.id)">Conectar</button>
+                @if (s.nodo.kind === 'evento' && s.nodo.tipoEvento === 'THROW') {
+                  <button type="button" (click)="estado.nuevoMensaje(s.nodo.id)">
+                    Enviar mensaje
+                  </button>
+                }
               }
               @if (estado.puedeEliminarFlujo()) {
                 <button type="button" class="btn-peligro" (click)="pedirEliminarNodo(s.nodo)">
@@ -267,6 +319,27 @@
                 </button>
               }
             </div>
+          }
+          @if (s.tipo === 'mensaje') {
+            <app-correlacion-panel
+              [mensajeId]="s.mensaje.id"
+              [puedeEditar]="estado.puedeModelar()"
+              [puedeEliminar]="estado.puedeEliminarFlujo()"
+              (cambio)="estado.recargar()"
+            />
+            @if (estado.puedeEliminarFlujo()) {
+              <div class="acciones">
+                <button
+                  type="button"
+                  class="btn-peligro"
+                  (click)="
+                    pendiente.set({ tipo: 'mensaje', id: s.mensaje.id, nombre: s.mensaje.nombre })
+                  "
+                >
+                  Eliminar mensaje
+                </button>
+              </div>
+            }
           }
           @if (s.tipo === 'arco' && estado.puedeEliminarFlujo()) {
             <div class="acciones">

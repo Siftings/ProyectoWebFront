@@ -54,6 +54,17 @@
       (elegir)="seleccionar.emit({ tipo: 'arco', id: a.arco.id })"
     />
   }
+  @for (m of vista().mensajes; track m.mensaje.id) {
+    <g
+      appMensajeView
+      [mensaje]="m.mensaje"
+      [desde]="m.desde"
+      [hasta]="m.hasta"
+      [etiqueta]="etiquetaMensaje(m.mensaje)"
+      [seleccionado]="esSeleccion('mensaje', m.mensaje.id)"
+      (elegir)="seleccionar.emit({ tipo: 'mensaje', id: m.mensaje.id })"
+    />
+  }
   @for (n of vista().nodos; track n.nodo.id) {
     <g
       appNodoView

@@ -4,6 +4,7 @@ import { TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 import { ArcosService } from '../../core/services/arcos.service';
 import { LanesService } from '../../core/services/lanes.service';
+import { MensajesService } from '../../core/services/mensajes.service';
 import { PermisosEstructuraService } from '../../core/services/permisos-estructura.service';
 import { NodosService } from '../../core/services/nodos.service';
 import { PoolsService } from '../../core/services/pools.service';
@@ -56,6 +57,33 @@ function diagrama(estado: EstadoProceso): ProcesoDiagramaResponse {
   };
 }
 
+function diagramaConMensaje(): ProcesoDiagramaResponse {
+  const base = diagrama('BORRADOR');
+  const evento = (id: number, laneId: number, tipoEvento: 'THROW' | 'CATCH_INTERMEDIO') => ({
+    id,
+    nombre: 'Pedido',
+    tipoEvento,
+    contenido: 'datos',
+    claveCorrelacion: 'idProceso',
+    posicionX: 0,
+    posicionY: 0,
+    laneId,
+    origenExterno: false,
+  });
+  return {
+    ...base,
+    pools: [
+      ...base.pools,
+      { id: 2, nombre: 'B', tipoParticipante: 'EMPRESA', cajaNegra: false, orden: 1, procesoId: 1 },
+    ],
+    lanes: [
+      ...base.lanes,
+      { id: 12, nombre: 'L2', orden: 0, poolId: 2, rolProcesoId: 1, rolProcesoNombre: 'R' },
+    ],
+    eventos: [evento(300, 11, 'THROW'), evento(301, 12, 'CATCH_INTERMEDIO')],
+  };
+}
+
 describe('EditorStateService', () => {
   const puedeEditar = signal(true);
   const rol = signal<RolAcceso>('ADMINISTRADOR');
@@ -69,6 +97,7 @@ describe('EditorStateService', () => {
   const impactoNodoMock = vi.fn();
   const eliminarArcoMock = vi.fn();
   const impactoArcoMock = vi.fn();
+  const eliminarMensajeMock = vi.fn();
   let estado: EditorStateService;
 
   beforeEach(() => {
@@ -84,6 +113,7 @@ describe('EditorStateService', () => {
     impactoNodoMock.mockReset();
     eliminarArcoMock.mockReset();
     impactoArcoMock.mockReset();
+    eliminarMensajeMock.mockReset();
     listarPermisosMock.mockReturnValue(of([]));
     TestBed.configureTestingModule({
       providers: [
@@ -102,6 +132,7 @@ describe('EditorStateService', () => {
           provide: ArcosService,
           useValue: { eliminar: eliminarArcoMock, impacto: impactoArcoMock },
         },
+        { provide: MensajesService, useValue: { eliminar: eliminarMensajeMock } },
         {
           provide: LanesService,
           useValue: { reordenar: reordenarMock, eliminar: eliminarLaneMock },
@@ -491,6 +522,100 @@ describe('EditorStateService', () => {
       estado.eliminarArco(200);
 
       expect(estado.errorAccion()).toBe('Arco no encontrado.');
+    });
+  });
+
+  describe('mensajes', () => {
+    beforeEach(() => {
+      diagramaMock.mockReturnValue(of(diagramaConMensaje()));
+      estado.cargar(1);
+    });
+
+    it('nuevoMensaje abre el alta con el THROW y sus receptores posibles', () => {
+      estado.nuevoMensaje(300);
+
+      expect(estado.creando()).toEqual({ tipo: 'mensaje', throwId: 300, catchId: null });
+      expect(estado.altaMensaje()?.origen.id).toBe(300);
+      expect(estado.altaMensaje()?.candidatos.map((n) => n.id)).toEqual([301]);
+    });
+
+    it('en modo mensaje, un receptor válido fija el CATCH y conserva la selección', () => {
+      estado.seleccionar({ tipo: 'nodo', id: 300 });
+      estado.nuevoMensaje(300);
+
+      estado.seleccionar({ tipo: 'nodo', id: 301 });
+
+      expect(estado.creando()).toEqual({ tipo: 'mensaje', throwId: 300, catchId: 301 });
+      expect(estado.seleccion()).toEqual({ tipo: 'nodo', id: 300 });
+    });
+
+    it('en modo mensaje, un nodo que no es receptor o una lane cancelan el alta', () => {
+      estado.nuevoMensaje(300);
+      estado.seleccionar({ tipo: 'nodo', id: 100 });
+      expect(estado.creando()).toBeNull();
+
+      estado.nuevoMensaje(300);
+      estado.seleccionar({ tipo: 'lane', id: 11 });
+      expect(estado.creando()).toBeNull();
+      expect(estado.seleccion()).toEqual({ tipo: 'lane', id: 11 });
+    });
+
+    it('resuelve el mensaje seleccionado con sus eventos y pools', () => {
+      const d = diagramaConMensaje();
+      d.mensajes = [
+        {
+          id: 400,
+          nombre: 'Pedido',
+          contenido: 'datos',
+          poolOrigenId: 1,
+          poolDestinoId: 2,
+          procesoId: 1,
+          eventoThrowId: 300,
+          eventoCatchId: 301,
+          claveCorrelacion: 'idProceso',
+          tipoDestinoExterno: null,
+          destinoExterno: null,
+          politicaFalloNotificacion: null,
+          actividadErrorId: null,
+          politicaSinCaso: 'DESCARTAR',
+          sinReceptor: false,
+        },
+      ];
+      diagramaMock.mockReturnValue(of(d));
+      estado.cargar(1);
+
+      estado.seleccionar({ tipo: 'mensaje', id: 400 });
+      const s = estado.seleccionado();
+
+      expect(s?.tipo === 'mensaje' && s.origen?.id).toBe(300);
+      expect(s?.tipo === 'mensaje' && s.poolDestino).toBe('B');
+    });
+
+    it('eliminarMensaje llama al servicio, limpia la selección y recarga', () => {
+      eliminarMensajeMock.mockReturnValue(of(undefined));
+      estado.seleccionar({ tipo: 'mensaje', id: 400 });
+
+      estado.eliminarMensaje(400);
+
+      expect(eliminarMensajeMock).toHaveBeenCalledWith(400);
+      expect(estado.seleccion()).toBeNull();
+      expect(diagramaMock).toHaveBeenCalledTimes(2);
+    });
+
+    it('eliminarMensaje guarda el detail del error', () => {
+      eliminarMensajeMock.mockReturnValue(
+        throwError(
+          () =>
+            new HttpErrorResponse({
+              status: 404,
+              error: { title: 'No encontrado', status: 404, detail: 'Mensaje no encontrado.' },
+            }),
+        ),
+      );
+
+      estado.eliminarMensaje(400);
+
+      expect(estado.errorAccion()).toBe('Mensaje no encontrado.');
     });
   });
 });

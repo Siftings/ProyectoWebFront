@@ -55,3 +55,8 @@ export const ETIQUETAS_ESTADO_PROCESO: Record<EstadoProceso, string> = {
   BORRADOR: 'Borrador',
   PUBLICADO: 'Publicado',
 };
+
+export const ETIQUETAS_POLITICA_SIN_CASO: Record<PoliticaMensajeSinCaso, string> = {
+  DESCARTAR: 'Descartar',
+  INICIAR_CASO_NUEVO: 'Iniciar caso nuevo',
+};
