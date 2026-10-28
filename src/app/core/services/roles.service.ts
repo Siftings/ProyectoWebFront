@@ -27,6 +27,10 @@ export class RolesService {
     return this.http.get<PageResponse<RolProcesoConsultaResponse>>(`${this.url}/consulta`, { params });
   }
 
+  todos(): Observable<RolProcesoVistaResponse[]> {
+    return this.http.get<RolProcesoVistaResponse[]>(this.url);
+  }
+
   obtener(id: number): Observable<RolProcesoVistaResponse> {
     return this.http.get<RolProcesoVistaResponse>(`${this.url}/${id}`);
   }
