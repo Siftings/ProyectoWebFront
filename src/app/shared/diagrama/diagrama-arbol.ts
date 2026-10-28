@@ -25,7 +25,7 @@ export interface PoolArbol {
   arcos: ArcoResponse[];
 }
 
-export type Seleccion = { tipo: 'pool' | 'lane' | 'nodo' | 'arco'; id: number } | null;
+export type Seleccion = { tipo: 'pool' | 'lane' | 'nodo' | 'arco' | 'mensaje'; id: number } | null;
 
 export function tipoNodo(n: NodoDiagrama): string {
   switch (n.kind) {

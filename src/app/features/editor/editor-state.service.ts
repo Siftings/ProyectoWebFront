@@ -5,18 +5,21 @@ import { Observable, Subject, catchError, finalize, map, of, switchMap, tap } fr
 import { detalleError } from '../../core/errors/problem-detail';
 import { ArcosService } from '../../core/services/arcos.service';
 import { LanesService } from '../../core/services/lanes.service';
+import { MensajesService } from '../../core/services/mensajes.service';
 import { PermisosEstructuraService } from '../../core/services/permisos-estructura.service';
 import { KindNodo, NodosService } from '../../core/services/nodos.service';
 import { PoolsService } from '../../core/services/pools.service';
 import { ProcesosService } from '../../core/services/procesos.service';
 import { UsuarioActualService } from '../../core/services/usuario-actual.service';
 import { ArcoResponse } from '../../models/arco';
+import { MensajeResponse } from '../../models/mensaje';
 import { PermisoEstructuraResponse } from '../../models/permisos';
 import { ProcesoDiagramaResponse } from '../../models/proceso';
 import { LaneResponse, PoolResponse } from '../../models/pool-lane';
 import { MovimientoNodo } from '../../shared/diagrama/arrastre';
 import { NodoDiagrama, Seleccion, armarArbol } from '../../shared/diagrama/diagrama-arbol';
 import { destinosPosibles } from './arcos-editor';
+import { NodoEvento, candidatosCatch, extremosMensaje } from './mensajes-editor';
 import { requestPosicion } from './nodos-editor';
 import { moverLane as nuevoOrden } from './orden-lanes';
 import { permisosEditor } from './permisos-editor';
@@ -31,6 +34,14 @@ export type ElementoSeleccionado =
       origen: string;
       destino: string;
       origenNodo: NodoDiagrama | undefined;
+    }
+  | {
+      tipo: 'mensaje';
+      mensaje: MensajeResponse;
+      origen: NodoDiagrama | undefined;
+      destino: NodoDiagrama | undefined;
+      poolOrigen: string;
+      poolDestino: string;
     };
 
 export type Creando =
@@ -38,6 +49,7 @@ export type Creando =
   | { tipo: 'lane'; poolId: number }
   | { tipo: 'nodo'; kind: KindNodo; laneId: number }
   | { tipo: 'arco'; origenId: number; destinoId: number | null }
+  | { tipo: 'mensaje'; throwId: number; catchId: number | null }
   | null;
 
 @Injectable()
@@ -47,6 +59,7 @@ export class EditorStateService {
   private readonly lanes = inject(LanesService);
   private readonly nodos = inject(NodosService);
   private readonly arcos = inject(ArcosService);
+  private readonly mensajesApi = inject(MensajesService);
   private readonly permisosApi = inject(PermisosEstructuraService);
   private readonly usuario = inject(UsuarioActualService);
   private readonly peticiones = new Subject<{ id: number; limpiar: boolean }>();
@@ -78,6 +91,8 @@ export class EditorStateService {
     permisosEditor(this.usuario.rol(), this.filasPermisos(), this.soloLectura()),
   );
 
+  readonly mensajes = computed(() => this.diagrama()?.mensajes ?? []);
+
   readonly puedeModelar = computed(() => !this.soloLectura());
 
   readonly puedeEliminarFlujo = computed(() => this.puedeModelar() && this.usuario.esAdmin());
@@ -93,6 +108,24 @@ export class EditorStateService {
       .find((n) => n.id === c.origenId);
     return origen
       ? { origen, destinos: destinosPosibles(arbol, c.origenId), destinoId: c.destinoId }
+      : null;
+  });
+
+  readonly altaMensaje = computed(() => {
+    const c = this.creando();
+    if (c?.tipo !== 'mensaje') {
+      return null;
+    }
+    const arbol = this.arbol();
+    const origen = arbol
+      .flatMap((p) => p.lanes.flatMap((l) => l.nodos))
+      .find((n): n is NodoEvento => n.kind === 'evento' && n.id === c.throwId);
+    return origen
+      ? {
+          origen,
+          candidatos: candidatosCatch(arbol, this.mensajes(), origen),
+          catchId: c.catchId,
+        }
       : null;
   });
 
@@ -115,6 +148,22 @@ export class EditorStateService {
       case 'nodo': {
         const nodo = nodos.find((n) => n.id === s.id);
         return nodo ? { tipo: 'nodo', nodo } : null;
+      }
+      case 'mensaje': {
+        const mensaje = this.mensajes().find((m) => m.id === s.id);
+        if (!mensaje) {
+          return null;
+        }
+        const extremos = extremosMensaje(mensaje, arbol);
+        const pool = (id: number) => arbol.find((p) => p.pool.id === id)?.pool.nombre ?? `#${id}`;
+        return {
+          tipo: 'mensaje',
+          mensaje,
+          origen: extremos?.origen,
+          destino: extremos?.destino,
+          poolOrigen: pool(mensaje.poolOrigenId),
+          poolDestino: pool(mensaje.poolDestinoId),
+        };
       }
       case 'arco': {
         const arco = arbol.flatMap((p) => p.arcos).find((a) => a.id === s.id);
@@ -186,6 +235,12 @@ export class EditorStateService {
         return;
       }
     }
+    if (c?.tipo === 'mensaje' && s?.tipo === 'nodo') {
+      if (this.altaMensaje()?.candidatos.some((n) => n.id === s.id)) {
+        this.creando.set({ ...c, catchId: s.id });
+        return;
+      }
+    }
     this.creando.set(null);
     this.errorAccion.set(null);
     this.seleccion.set(s);
@@ -210,6 +265,11 @@ export class EditorStateService {
   nuevoArco(origenId: number): void {
     this.errorAccion.set(null);
     this.creando.set({ tipo: 'arco', origenId, destinoId: null });
+  }
+
+  nuevoMensaje(throwId: number): void {
+    this.errorAccion.set(null);
+    this.creando.set({ tipo: 'mensaje', throwId, catchId: null });
   }
 
   cancelarCreacion(): void {
@@ -353,6 +413,24 @@ export class EditorStateService {
     this.errorAccion.set(null);
     this.ocupado.set(true);
     this.arcos
+      .eliminar(id)
+      .pipe(finalize(() => this.ocupado.set(false)))
+      .subscribe({
+        next: () => {
+          this.seleccion.set(null);
+          this.recargar();
+        },
+        error: (err: unknown) => this.errorAccion.set(detalleError(err)),
+      });
+  }
+
+  eliminarMensaje(id: number): void {
+    if (this.ocupado()) {
+      return;
+    }
+    this.errorAccion.set(null);
+    this.ocupado.set(true);
+    this.mensajesApi
       .eliminar(id)
       .pipe(finalize(() => this.ocupado.set(false)))
       .subscribe({

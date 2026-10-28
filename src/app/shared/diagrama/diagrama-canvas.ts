@@ -13,11 +13,13 @@ import {
   untracked,
 } from '@angular/core';
 import { ArcoResponse } from '../../models/arco';
+import { MensajeResponse } from '../../models/mensaje';
 import { ArcoView } from './arco-view';
 import { MovimientoNodo, posicionArrastrada } from './arrastre';
 import { NodoDiagrama, PoolArbol, Seleccion, tipoNodo } from './diagrama-arbol';
 import { Punto, calcularLayout } from './diagrama-layout';
 import { LaneView } from './lane-view';
+import { MensajeView } from './mensaje-view';
 import { NodoView } from './nodo-view';
 import { PoolView } from './pool-view';
 
@@ -32,13 +34,14 @@ const UMBRAL_ARRASTRE = 3;
 
 @Component({
   selector: 'app-diagrama-canvas',
-  imports: [PoolView, LaneView, NodoView, ArcoView],
+  imports: [PoolView, LaneView, NodoView, ArcoView, MensajeView],
   styleUrl: './diagrama-canvas.css',
   templateUrl: './diagrama-canvas.html',
   encapsulation: ViewEncapsulation.None,
 })
 export class DiagramaCanvas {
   readonly arbol = input.required<PoolArbol[]>();
+  readonly mensajes = input<MensajeResponse[]>([]);
   readonly seleccion = input<Seleccion>(null);
   readonly arrastrable = input(false);
   readonly seleccionar = output<Seleccion>();
@@ -96,7 +99,14 @@ export class DiagramaCanvas {
         return desde && hasta ? [{ arco, desde, hasta }] : [];
       }),
     );
-    return { ancho: layout.ancho, alto: layout.alto, pools, lanes, nodos, arcos };
+    const mensajes = this.mensajes().flatMap((mensaje) => {
+      const desde =
+        mensaje.eventoThrowId === null ? undefined : layout.nodos.get(mensaje.eventoThrowId);
+      const hasta =
+        mensaje.eventoCatchId === null ? undefined : layout.nodos.get(mensaje.eventoCatchId);
+      return desde && hasta ? [{ mensaje, desde, hasta }] : [];
+    });
+    return { ancho: layout.ancho, alto: layout.alto, pools, lanes, nodos, arcos, mensajes };
   });
 
   private readonly nombres = computed(
@@ -104,6 +114,10 @@ export class DiagramaCanvas {
       new Map(
         this.arbol().flatMap((p) => p.lanes.flatMap((l) => l.nodos.map((n) => [n.id, n.nombre]))),
       ),
+  );
+
+  private readonly pools = computed(
+    () => new Map(this.arbol().map((p) => [p.pool.id, p.pool.nombre])),
   );
 
   protected esSeleccion(tipo: NonNullable<Seleccion>['tipo'], id: number): boolean {
@@ -118,6 +132,11 @@ export class DiagramaCanvas {
   protected etiquetaArco(arco: ArcoResponse): string {
     const nombres = this.nombres();
     return `Arco de ${nombres.get(arco.origenId) ?? arco.origenId} a ${nombres.get(arco.destinoId) ?? arco.destinoId}`;
+  }
+
+  protected etiquetaMensaje(mensaje: MensajeResponse): string {
+    const pools = this.pools();
+    return `Mensaje ${mensaje.nombre} de ${pools.get(mensaje.poolOrigenId) ?? mensaje.poolOrigenId} a ${pools.get(mensaje.poolDestinoId) ?? mensaje.poolDestinoId}`;
   }
 
   protected iniciarArrastre(evento: PointerEvent, nodo: NodoDiagrama): void {

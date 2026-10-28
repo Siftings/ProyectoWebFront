@@ -2,7 +2,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { KindNodo } from '../../core/services/nodos.service';
-import { ETIQUETAS_TIPO_PARTICIPANTE } from '../../models/enums';
+import { ETIQUETAS_POLITICA_SIN_CASO, ETIQUETAS_TIPO_PARTICIPANTE } from '../../models/enums';
 import { AlertaError } from '../../shared/alerta-error/alerta-error';
 import { ConfirmDialog } from '../../shared/confirm-dialog/confirm-dialog';
 import { NodoDiagrama, tipoNodo } from '../../shared/diagrama/diagrama-arbol';
@@ -11,17 +11,20 @@ import { Punto } from '../../shared/diagrama/diagrama-layout';
 import { EstadoBadge } from '../../shared/estado-badge/estado-badge';
 import { ActividadFormulario } from './actividad-formulario';
 import { ArcoFormulario } from './arco-formulario';
+import { CorrelacionPanel } from './correlacion-panel';
 import { EditorStateService } from './editor-state.service';
 import { EventoFormulario } from './evento-formulario';
 import { GatewayFormulario } from './gateway-formulario';
 import { LaneFormulario } from './lane-formulario';
+import { MensajeFormulario } from './mensaje-formulario';
 import { posicionNueva } from './nodos-editor';
 import { PoolFormulario } from './pool-formulario';
 
 type Pendiente =
   | { tipo: 'pool' | 'lane'; id: number; nombre: string }
   | { tipo: 'nodo'; id: number; nombre: string; kind: KindNodo; advertencias: string[] }
-  | { tipo: 'arco'; id: number; nombre: string; advertencias: string[] };
+  | { tipo: 'arco'; id: number; nombre: string; advertencias: string[] }
+  | { tipo: 'mensaje'; id: number; nombre: string };
 
 @Component({
   imports: [
@@ -36,6 +39,8 @@ type Pendiente =
     ArcoFormulario,
     GatewayFormulario,
     EventoFormulario,
+    MensajeFormulario,
+    CorrelacionPanel,
   ],
   providers: [EditorStateService],
   selector: 'app-editor',
@@ -49,6 +54,7 @@ export class Editor {
   protected readonly estado = inject(EditorStateService);
   protected readonly id = Number(this.idParam);
   protected readonly participante = ETIQUETAS_TIPO_PARTICIPANTE;
+  protected readonly politicas = ETIQUETAS_POLITICA_SIN_CASO;
   protected readonly tipoNodo = tipoNodo;
   protected readonly pendiente = signal<Pendiente | null>(null);
   protected readonly advertencias = computed(() => {
@@ -72,6 +78,11 @@ export class Editor {
         return {
           titulo: `Eliminar el arco ${p.nombre}`,
           mensaje: 'Esta acción no se puede deshacer.',
+        };
+      case 'mensaje':
+        return {
+          titulo: `Eliminar el mensaje "${p.nombre}"`,
+          mensaje: 'También se elimina su correlación. Esta acción no se puede deshacer.',
         };
       default:
         return {
@@ -133,6 +144,8 @@ export class Editor {
       this.estado.eliminarNodo(p.kind, p.id);
     } else if (p.tipo === 'arco') {
       this.estado.eliminarArco(p.id);
+    } else if (p.tipo === 'mensaje') {
+      this.estado.eliminarMensaje(p.id);
     } else {
       this.estado.eliminar(p.tipo, p.id);
     }

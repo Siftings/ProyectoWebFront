@@ -54,6 +54,10 @@
   stroke: var(--color-text);
 }
 
+.dg-mensaje {
+  stroke-dasharray: 6 4;
+}
+
 .dg-arco-area {
   stroke: transparent;
   stroke-width: 12;

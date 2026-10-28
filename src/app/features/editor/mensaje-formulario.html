@@ -1,0 +1,58 @@
+<form class="formulario" [formGroup]="form" (ngSubmit)="enviar()" novalidate>
+  <app-alerta-error [mensaje]="error()" />
+
+  @if (!mensaje()) {
+    <div class="campo">
+      <label for="mensaje-receptor">Receptor</label>
+      @if (candidatos().length === 0) {
+        <p>
+          No hay eventos de recepción en otro pool con el mismo nombre y clave de correlación que
+          este envío.
+        </p>
+      } @else {
+        <select id="mensaje-receptor" formControlName="catchId">
+          <option [ngValue]="null">Elige un evento</option>
+          @for (n of candidatos(); track n.id) {
+            <option [ngValue]="n.id">{{ n.nombre }}</option>
+          }
+        </select>
+        <app-error-campo
+          [mostrar]="form.controls.catchId.touched && form.controls.catchId.invalid"
+          mensaje="Elige el receptor del mensaje."
+          [servidor]="erroresCampo()['eventoCatchId']"
+        />
+      }
+    </div>
+  }
+
+  <div class="campo">
+    <label for="mensaje-contenido">Contenido</label>
+    <input id="mensaje-contenido" type="text" formControlName="contenido" autocomplete="off" />
+    <app-error-campo
+      [mostrar]="form.controls.contenido.touched && form.controls.contenido.invalid"
+      mensaje="Ingresa el contenido del mensaje."
+      [servidor]="erroresCampo()['contenido']"
+    />
+  </div>
+
+  <div class="campo">
+    <label for="mensaje-politica">Si no hay caso al recibirlo</label>
+    <select id="mensaje-politica" formControlName="politicaSinCaso">
+      @for (p of politicas; track p[0]) {
+        <option [value]="p[0]">{{ p[1] }}</option>
+      }
+    </select>
+    <app-error-campo [mostrar]="false" mensaje="" [servidor]="erroresCampo()['politicaSinCaso']" />
+  </div>
+
+  <button
+    type="submit"
+    class="btn-primario"
+    [disabled]="enviando() || (!mensaje() && candidatos().length === 0)"
+  >
+    {{ enviando() ? 'Guardando…' : 'Guardar' }}
+  </button>
+  @if (!mensaje()) {
+    <button type="button" (click)="cancelar.emit()">Cancelar</button>
+  }
+</form>
