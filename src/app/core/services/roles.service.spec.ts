@@ -66,6 +66,14 @@ describe('RolesService', () => {
     req.flush({ content: [], page: 0, size: 10, totalElements: 0, totalPages: 0 });
   });
 
+  it('todos pide la lista completa de roles activos', () => {
+    servicio.todos().subscribe();
+
+    const req = http.expectOne('http://api/roles');
+    expect(req.request.method).toBe('GET');
+    req.flush([VISTA]);
+  });
+
   it('obtener pide el rol por id', () => {
     servicio.obtener(3).subscribe();
 

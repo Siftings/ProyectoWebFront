@@ -1,0 +1,44 @@
+<form class="formulario" [formGroup]="form" (ngSubmit)="enviar()" novalidate>
+  <app-alerta-error [mensaje]="error()" />
+
+  <div class="campo">
+    <label for="pool-nombre">Nombre</label>
+    <input
+      id="pool-nombre"
+      type="text"
+      maxlength="255"
+      formControlName="nombre"
+      autocomplete="off"
+    />
+    <app-error-campo
+      [mostrar]="form.controls.nombre.touched && form.controls.nombre.invalid"
+      mensaje="Ingresa el nombre del pool."
+      [servidor]="erroresCampo()['nombre']"
+    />
+  </div>
+
+  <div class="campo">
+    <label for="pool-tipo">Participante</label>
+    <select id="pool-tipo" formControlName="tipoParticipante">
+      @for (t of tipos; track t[0]) {
+        <option [value]="t[0]">{{ t[1] }}</option>
+      }
+    </select>
+    <app-error-campo [mostrar]="false" mensaje="" [servidor]="erroresCampo()['tipoParticipante']" />
+  </div>
+
+  <div class="campo">
+    <label for="pool-caja-negra">
+      <input id="pool-caja-negra" type="checkbox" formControlName="cajaNegra" />
+      Caja negra
+    </label>
+    <app-error-campo [mostrar]="false" mensaje="" [servidor]="erroresCampo()['cajaNegra']" />
+  </div>
+
+  <button type="submit" class="btn-primario" [disabled]="enviando()">
+    {{ enviando() ? 'Guardando…' : 'Guardar' }}
+  </button>
+  @if (!pool()) {
+    <button type="button" (click)="cancelar.emit()">Cancelar</button>
+  }
+</form>
