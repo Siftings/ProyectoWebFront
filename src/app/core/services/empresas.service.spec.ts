@@ -2,7 +2,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { ConfigService } from '../config/config.service';
-import { EmpresaResponse, RegistroEmpresaRequest } from '../../models/auth';
+import { EmpresaResponse, EmpresaResumenResponse, RegistroEmpresaRequest } from '../../models/auth';
 import { EmpresasService } from './empresas.service';
 
 const SOLICITUD: RegistroEmpresaRequest = {
@@ -50,5 +50,17 @@ describe('EmpresasService', () => {
     req.flush(RESPUESTA);
 
     expect(recibida).toEqual(RESPUESTA);
+  });
+
+  it('buscarPorNit hace GET /empresas con el NIT como query', () => {
+    let recibida: EmpresaResumenResponse | undefined;
+    servicio.buscarPorNit('900654321-2').subscribe((e) => (recibida = e));
+
+    const req = http.expectOne((r) => r.url === 'http://api/empresas');
+    expect(req.request.method).toBe('GET');
+    expect(req.request.params.get('nit')).toBe('900654321-2');
+    req.flush({ id: 2, nombre: 'Empresa Beta S.A.S.' });
+
+    expect(recibida).toEqual({ id: 2, nombre: 'Empresa Beta S.A.S.' });
   });
 });

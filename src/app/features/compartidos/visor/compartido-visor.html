@@ -1,0 +1,27 @@
+<p><a routerLink="/compartidos">Volver a compartidos</a></p>
+
+<app-alerta-error [mensaje]="error()" />
+
+@if (datos(); as d) {
+  <div class="encabezado">
+    <h1>{{ d.proceso.nombre }}</h1>
+    <app-estado-badge [estado]="d.proceso.estado" />
+  </div>
+  <p>Empresa propietaria: {{ d.empresaPropietaria }}</p>
+  <p class="alerta alerta-aviso">Proceso compartido: solo lectura.</p>
+
+  <div class="lienzo">
+    @if (arbol().length === 0) {
+      <p class="vacio">El diagrama no tiene pools.</p>
+    } @else {
+      <app-diagrama-canvas
+        [arbol]="arbol()"
+        [mensajes]="d.mensajes"
+        [seleccion]="seleccion()"
+        (seleccionar)="seleccion.set($event)"
+      />
+    }
+  </div>
+} @else if (!error()) {
+  <p>Cargando…</p>
+}

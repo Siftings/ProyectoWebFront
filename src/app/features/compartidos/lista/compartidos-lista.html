@@ -1,0 +1,34 @@
+<h1>Compartidos conmigo</h1>
+
+<app-alerta-error [mensaje]="error()" />
+
+@if (lista(); as filas) {
+  @if (filas.length === 0) {
+    <p>Ninguna empresa ha compartido procesos con la tuya.</p>
+  } @else {
+    <div class="tabla">
+      <table>
+        <thead>
+          <tr>
+            <th>Proceso</th>
+            <th>Empresa propietaria</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (fila of filas; track fila.id) {
+            <tr>
+              <td>{{ fila.procesoNombre }}</td>
+              <td>{{ fila.empresaPropietaria }}</td>
+              <td class="acciones">
+                <a class="btn-enlace" [routerLink]="['/compartidos', fila.procesoId]">Ver</a>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+} @else if (!error()) {
+  <p>Cargando…</p>
+}
