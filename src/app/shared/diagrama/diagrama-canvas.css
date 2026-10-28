@@ -87,3 +87,11 @@
   stroke: var(--color-accent);
   stroke-width: 3;
 }
+
+.dg-arrastrable {
+  touch-action: none;
+}
+
+.dg-arrastrable .dg-nodo-g {
+  cursor: move;
+}
