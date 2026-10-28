@@ -1,11 +1,33 @@
 // Lienzo SVG del diagrama: dibuja el árbol de pools, lanes, arcos y nodos y avisa qué elemento se elige.
-import { Component, ViewEncapsulation, computed, input, output } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import {
+  Component,
+  DestroyRef,
+  ViewEncapsulation,
+  computed,
+  effect,
+  inject,
+  input,
+  output,
+  signal,
+  untracked,
+} from '@angular/core';
 import { ArcoView } from './arco-view';
+import { MovimientoNodo, posicionArrastrada } from './arrastre';
 import { NodoDiagrama, PoolArbol, Seleccion, tipoNodo } from './diagrama-arbol';
-import { calcularLayout } from './diagrama-layout';
+import { Punto, calcularLayout } from './diagrama-layout';
 import { LaneView } from './lane-view';
 import { NodoView } from './nodo-view';
 import { PoolView } from './pool-view';
+
+interface Arrastre {
+  id: number;
+  inicio: Punto;
+  posicion: Punto;
+  delta: Punto;
+}
+
+const UMBRAL_ARRASTRE = 3;
 
 @Component({
   selector: 'app-diagrama-canvas',
@@ -17,11 +39,37 @@ import { PoolView } from './pool-view';
 export class DiagramaCanvas {
   readonly arbol = input.required<PoolArbol[]>();
   readonly seleccion = input<Seleccion>(null);
+  readonly arrastrable = input(false);
   readonly seleccionar = output<Seleccion>();
+  readonly mover = output<MovimientoNodo>();
+
+  private readonly documento = inject(DOCUMENT);
+  private readonly arrastre = signal<Arrastre | null>(null);
+  private readonly alMover = (evento: PointerEvent) => this.arrastrar(evento);
+  private readonly alSoltar = () => this.soltar();
+  private readonly alCancelar = () => this.cancelarArrastre();
+
+  constructor() {
+    effect(() => {
+      this.arbol();
+      untracked(() => this.arrastre.set(null));
+    });
+    inject(DestroyRef).onDestroy(() => this.escuchar(false));
+  }
 
   protected readonly vista = computed(() => {
     const arbol = this.arbol();
     const layout = calcularLayout(arbol);
+    const a = this.arrastre();
+    const caja = a ? layout.nodos.get(a.id) : undefined;
+    if (a && caja) {
+      const destino = posicionArrastrada(a.posicion, a.delta);
+      layout.nodos.set(a.id, {
+        ...caja,
+        x: caja.x + destino.x - a.posicion.x,
+        y: caja.y + destino.y - a.posicion.y,
+      });
+    }
     const pools = arbol.flatMap(({ pool, lanes }) => {
       const caja = layout.pools.get(pool.id);
       return caja ? [{ pool, caja, sinLanes: lanes.length === 0 }] : [];
@@ -57,5 +105,59 @@ export class DiagramaCanvas {
 
   protected etiquetaNodo(nodo: NodoDiagrama): string {
     return `${tipoNodo(nodo)}: ${nodo.nombre}`;
+  }
+
+  protected iniciarArrastre(evento: PointerEvent, nodo: NodoDiagrama): void {
+    if (!this.arrastrable() || evento.button !== 0) {
+      return;
+    }
+    this.arrastre.set({
+      id: nodo.id,
+      inicio: { x: evento.clientX, y: evento.clientY },
+      posicion: { x: nodo.posicionX, y: nodo.posicionY },
+      delta: { x: 0, y: 0 },
+    });
+    this.escuchar(true);
+  }
+
+  private arrastrar(evento: PointerEvent): void {
+    const a = this.arrastre();
+    if (a) {
+      this.arrastre.set({
+        ...a,
+        delta: { x: evento.clientX - a.inicio.x, y: evento.clientY - a.inicio.y },
+      });
+    }
+  }
+
+  private soltar(): void {
+    this.escuchar(false);
+    const a = this.arrastre();
+    if (!a) {
+      return;
+    }
+    if (Math.hypot(a.delta.x, a.delta.y) < UMBRAL_ARRASTRE) {
+      this.arrastre.set(null);
+      return;
+    }
+    const destino = posicionArrastrada(a.posicion, a.delta);
+    this.mover.emit({ id: a.id, posicionX: destino.x, posicionY: destino.y });
+  }
+
+  private cancelarArrastre(): void {
+    this.escuchar(false);
+    this.arrastre.set(null);
+  }
+
+  private escuchar(activo: boolean): void {
+    if (activo) {
+      this.documento.addEventListener('pointermove', this.alMover);
+      this.documento.addEventListener('pointerup', this.alSoltar);
+      this.documento.addEventListener('pointercancel', this.alCancelar);
+    } else {
+      this.documento.removeEventListener('pointermove', this.alMover);
+      this.documento.removeEventListener('pointerup', this.alSoltar);
+      this.documento.removeEventListener('pointercancel', this.alCancelar);
+    }
   }
 }

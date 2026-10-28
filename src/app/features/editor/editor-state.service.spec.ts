@@ -4,6 +4,7 @@ import { TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 import { LanesService } from '../../core/services/lanes.service';
 import { PermisosEstructuraService } from '../../core/services/permisos-estructura.service';
+import { NodosService } from '../../core/services/nodos.service';
 import { PoolsService } from '../../core/services/pools.service';
 import { ProcesosService } from '../../core/services/procesos.service';
 import { UsuarioActualService } from '../../core/services/usuario-actual.service';
@@ -62,6 +63,9 @@ describe('EditorStateService', () => {
   const eliminarLaneMock = vi.fn();
   const eliminarPoolMock = vi.fn();
   const listarPermisosMock = vi.fn();
+  const editarNodoMock = vi.fn();
+  const eliminarNodoMock = vi.fn();
+  const impactoNodoMock = vi.fn();
   let estado: EditorStateService;
 
   beforeEach(() => {
@@ -72,12 +76,23 @@ describe('EditorStateService', () => {
     eliminarLaneMock.mockReset();
     eliminarPoolMock.mockReset();
     listarPermisosMock.mockReset();
+    editarNodoMock.mockReset();
+    eliminarNodoMock.mockReset();
+    impactoNodoMock.mockReset();
     listarPermisosMock.mockReturnValue(of([]));
     TestBed.configureTestingModule({
       providers: [
         EditorStateService,
         { provide: ProcesosService, useValue: { diagrama: diagramaMock } },
         { provide: PoolsService, useValue: { eliminar: eliminarPoolMock } },
+        {
+          provide: NodosService,
+          useValue: {
+            editar: editarNodoMock,
+            eliminar: eliminarNodoMock,
+            impacto: impactoNodoMock,
+          },
+        },
         {
           provide: LanesService,
           useValue: { reordenar: reordenarMock, eliminar: eliminarLaneMock },
@@ -193,6 +208,7 @@ describe('EditorStateService', () => {
           EditorStateService,
           { provide: ProcesosService, useValue: { diagrama: diagramaMock } },
           { provide: PoolsService, useValue: {} },
+          { provide: NodosService, useValue: {} },
           { provide: LanesService, useValue: {} },
           { provide: PermisosEstructuraService, useValue: { listar: listarPermisosMock } },
           { provide: UsuarioActualService, useValue: { puedeEditar, rol, esAdmin: () => true } },
@@ -213,6 +229,7 @@ describe('EditorStateService', () => {
           EditorStateService,
           { provide: ProcesosService, useValue: { diagrama: diagramaMock } },
           { provide: PoolsService, useValue: {} },
+          { provide: NodosService, useValue: {} },
           { provide: LanesService, useValue: {} },
           { provide: PermisosEstructuraService, useValue: { listar: listarPermisosMock } },
           { provide: UsuarioActualService, useValue: { puedeEditar, rol, esAdmin: () => false } },
@@ -302,6 +319,95 @@ describe('EditorStateService', () => {
       expect(estado.creando()).toBeNull();
       expect(estado.seleccion()).toEqual({ tipo: 'lane', id: 11 });
       expect(diagramaMock).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  describe('nodos', () => {
+    it('puedeEliminarNodo es falso para un editor y con el proceso publicado', () => {
+      diagramaMock.mockReturnValue(of(diagrama('BORRADOR')));
+      estado.cargar(1);
+      expect(estado.puedeModelar()).toBe(true);
+      expect(estado.puedeEliminarNodo()).toBe(true);
+
+      rol.set('EDITOR');
+      expect(estado.puedeEliminarNodo()).toBe(false);
+
+      rol.set('ADMINISTRADOR');
+      diagramaMock.mockReturnValue(of(diagrama('PUBLICADO')));
+      estado.cargar(1);
+      expect(estado.puedeModelar()).toBe(false);
+      expect(estado.puedeEliminarNodo()).toBe(false);
+    });
+
+    it('moverNodo manda el PUT completo del nodo y recarga', () => {
+      diagramaMock.mockReturnValue(of(diagrama('BORRADOR')));
+      editarNodoMock.mockReturnValue(of({}));
+      estado.cargar(1);
+
+      estado.moverNodo({ id: 101, posicionX: 250, posicionY: 30 });
+
+      expect(editarNodoMock).toHaveBeenCalledWith('actividad', 101, {
+        nombre: 'Aprobar',
+        descripcion: undefined,
+        tipoActividad: 'USUARIO',
+        posicionX: 250,
+        posicionY: 30,
+      });
+      expect(diagramaMock).toHaveBeenCalledTimes(2);
+    });
+
+    it('moverNodo guarda el detail del error y recarga', () => {
+      diagramaMock.mockReturnValue(of(diagrama('BORRADOR')));
+      editarNodoMock.mockReturnValue(
+        throwError(
+          () =>
+            new HttpErrorResponse({
+              status: 409,
+              error: { title: 'Conflicto', status: 409, detail: 'El proceso está publicado.' },
+            }),
+        ),
+      );
+      estado.cargar(1);
+
+      estado.moverNodo({ id: 100, posicionX: 5, posicionY: 5 });
+
+      expect(estado.errorAccion()).toBe('El proceso está publicado.');
+      expect(diagramaMock).toHaveBeenCalledTimes(2);
+    });
+
+    it('eliminarNodo llama al servicio con su tipo, limpia la selección y recarga', () => {
+      diagramaMock.mockReturnValue(of(diagrama('BORRADOR')));
+      eliminarNodoMock.mockReturnValue(of(undefined));
+      estado.cargar(1);
+      estado.seleccionar({ tipo: 'nodo', id: 100 });
+
+      estado.eliminarNodo('actividad', 100);
+
+      expect(eliminarNodoMock).toHaveBeenCalledWith('actividad', 100);
+      expect(estado.seleccion()).toBeNull();
+      expect(diagramaMock).toHaveBeenCalledTimes(2);
+    });
+
+    it('advertenciasNodo entrega las advertencias del impacto', () => {
+      impactoNodoMock.mockReturnValue(
+        of({
+          requiereConfirmacion: true,
+          rompeContinuidad: true,
+          advertencias: ['Rompe el flujo.'],
+        }),
+      );
+      const alResolver = vi.fn();
+
+      estado.advertenciasNodo('gateway', 4, alResolver);
+
+      expect(impactoNodoMock).toHaveBeenCalledWith('gateway', 4);
+      expect(alResolver).toHaveBeenCalledWith(['Rompe el flujo.']);
+    });
+
+    it('nuevoNodo abre el alta del tipo en la lane', () => {
+      estado.nuevoNodo('evento', 11);
+
+      expect(estado.creando()).toEqual({ tipo: 'nodo', kind: 'evento', laneId: 11 });
     });
   });
 });
