@@ -12,6 +12,7 @@ import {
   signal,
   untracked,
 } from '@angular/core';
+import { ArcoResponse } from '../../models/arco';
 import { ArcoView } from './arco-view';
 import { MovimientoNodo, posicionArrastrada } from './arrastre';
 import { NodoDiagrama, PoolArbol, Seleccion, tipoNodo } from './diagrama-arbol';
@@ -98,6 +99,13 @@ export class DiagramaCanvas {
     return { ancho: layout.ancho, alto: layout.alto, pools, lanes, nodos, arcos };
   });
 
+  private readonly nombres = computed(
+    () =>
+      new Map(
+        this.arbol().flatMap((p) => p.lanes.flatMap((l) => l.nodos.map((n) => [n.id, n.nombre]))),
+      ),
+  );
+
   protected esSeleccion(tipo: NonNullable<Seleccion>['tipo'], id: number): boolean {
     const s = this.seleccion();
     return s !== null && s.tipo === tipo && s.id === id;
@@ -105,6 +113,11 @@ export class DiagramaCanvas {
 
   protected etiquetaNodo(nodo: NodoDiagrama): string {
     return `${tipoNodo(nodo)}: ${nodo.nombre}`;
+  }
+
+  protected etiquetaArco(arco: ArcoResponse): string {
+    const nombres = this.nombres();
+    return `Arco de ${nombres.get(arco.origenId) ?? arco.origenId} a ${nombres.get(arco.destinoId) ?? arco.destinoId}`;
   }
 
   protected iniciarArrastre(evento: PointerEvent, nodo: NodoDiagrama): void {

@@ -1,0 +1,61 @@
+<form class="formulario" [formGroup]="form" (ngSubmit)="enviar()" novalidate>
+  <app-alerta-error [mensaje]="error()" />
+
+  @if (!arco()) {
+    <div class="campo">
+      <label for="arco-destino">Destino</label>
+      @if (destinos().length === 0) {
+        <p>No hay nodos del mismo pool a los que se pueda conectar.</p>
+      } @else {
+        <select id="arco-destino" formControlName="destinoId">
+          <option [ngValue]="null">Elige un nodo</option>
+          @for (n of destinos(); track n.id) {
+            <option [ngValue]="n.id">{{ n.nombre }}</option>
+          }
+        </select>
+        <app-error-campo
+          [mostrar]="form.controls.destinoId.touched && form.controls.destinoId.invalid"
+          mensaje="Elige el destino del arco."
+          [servidor]="erroresCampo()['destinoId']"
+        />
+      }
+    </div>
+  }
+
+  <div class="campo">
+    <label for="arco-etiqueta">Etiqueta</label>
+    <input
+      id="arco-etiqueta"
+      type="text"
+      maxlength="255"
+      formControlName="etiqueta"
+      autocomplete="off"
+    />
+    <app-error-campo [mostrar]="false" mensaje="" [servidor]="erroresCampo()['etiqueta']" />
+  </div>
+
+  <div class="campo">
+    <label for="arco-condicion">
+      Condición{{ condicionObligatoria() ? ' (obligatoria al salir de este gateway)' : '' }}
+    </label>
+    <input
+      id="arco-condicion"
+      type="text"
+      maxlength="255"
+      formControlName="condicion"
+      autocomplete="off"
+    />
+    <app-error-campo
+      [mostrar]="form.controls.condicion.touched && form.controls.condicion.invalid"
+      mensaje="Ingresa la condición del arco."
+      [servidor]="erroresCampo()['condicion']"
+    />
+  </div>
+
+  <button type="submit" class="btn-primario" [disabled]="enviando()">
+    {{ enviando() ? 'Guardando…' : 'Guardar' }}
+  </button>
+  @if (!arco()) {
+    <button type="button" (click)="cancelar.emit()">Cancelar</button>
+  }
+</form>

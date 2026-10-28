@@ -53,6 +53,18 @@
             (guardado)="estado.guardado({ tipo: 'lane', id: $event })"
             (cancelar)="estado.cancelarCreacion()"
           />
+        } @else if (c.tipo === 'arco') {
+          <h2>Nuevo arco</h2>
+          @if (estado.altaArco(); as alta) {
+            <p>Origen: {{ alta.origen.nombre }}. Elige el destino en el diagrama o en la lista.</p>
+            <app-arco-formulario
+              [origen]="alta.origen"
+              [destinos]="alta.destinos"
+              [destinoId]="alta.destinoId"
+              (guardado)="estado.guardado({ tipo: 'arco', id: $event })"
+              (cancelar)="estado.cancelarCreacion()"
+            />
+          }
         } @else if (c.kind === 'actividad') {
           <h2>Nueva actividad</h2>
           <app-actividad-formulario
@@ -117,6 +129,13 @@
                 />
               }
             }
+          } @else if (s.tipo === 'arco' && estado.puedeModelar() && s.origenNodo) {
+            <p>Arco de {{ s.origen }} a {{ s.destino }}.</p>
+            <app-arco-formulario
+              [origen]="s.origenNodo"
+              [arco]="s.arco"
+              (guardado)="estado.guardado({ tipo: 'arco', id: $event })"
+            />
           } @else {
             <dl class="datos">
               @if (s.tipo === 'pool') {
@@ -237,10 +256,26 @@
             </div>
           }
 
-          @if (s.tipo === 'nodo' && estado.puedeEliminarNodo()) {
+          @if (s.tipo === 'nodo' && (estado.puedeModelar() || estado.puedeEliminarFlujo())) {
             <div class="acciones">
-              <button type="button" class="btn-peligro" (click)="pedirEliminarNodo(s.nodo)">
-                Eliminar {{ tipoNodo(s.nodo).toLowerCase() }}
+              @if (estado.puedeModelar()) {
+                <button type="button" (click)="estado.nuevoArco(s.nodo.id)">Conectar</button>
+              }
+              @if (estado.puedeEliminarFlujo()) {
+                <button type="button" class="btn-peligro" (click)="pedirEliminarNodo(s.nodo)">
+                  Eliminar {{ tipoNodo(s.nodo).toLowerCase() }}
+                </button>
+              }
+            </div>
+          }
+          @if (s.tipo === 'arco' && estado.puedeEliminarFlujo()) {
+            <div class="acciones">
+              <button
+                type="button"
+                class="btn-peligro"
+                (click)="pedirEliminarArco(s.arco.id, s.origen, s.destino)"
+              >
+                Eliminar arco
               </button>
             </div>
           }
