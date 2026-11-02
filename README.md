@@ -57,3 +57,43 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+## Despliegue con Docker
+
+El front y el back pueden estar en máquinas distintas. La imagen sirve la app con nginx y crea el archivo de
+configuración al arrancar, así la dirección del back no se fija al compilar.
+
+Construir la imagen:
+
+```bash
+docker build -t frontangular .
+```
+
+Ejecutarla en la máquina del front:
+
+```bash
+docker run -p 80:80 \
+  -e API_URL=http://<ip-vm-back>:8080/api/v1 \
+  -e USUARIO_FIJO_EMAIL=admin@demo.com \
+  -e USUARIO_FIJO_ROL=ADMINISTRADOR \
+  frontangular
+```
+
+Las tres variables son obligatorias. Si falta alguna, el contenedor se detiene y dice cuál. El rol puede ser
+`ADMINISTRADOR`, `EDITOR` o `SOLO_LECTURA`.
+
+`API_URL` la usa el navegador de quien abre la app, no el contenedor. Debe ser una dirección a la que ese navegador
+llegue.
+
+En la máquina del back hay que definir estas variables antes de arrancarlo:
+
+| Variable | Valor |
+|---|---|
+| `CORS_ALLOWED_ORIGINS` | `http://<ip-vm-front>` |
+| `JWT_HABILITADO` | `false` |
+| `USUARIO_FIJO` | el mismo correo que `USUARIO_FIJO_EMAIL` |
+
+Ambas máquinas deben usar HTTP. Si el front se sirviera por HTTPS, el navegador bloquearía las llamadas a un back en
+HTTP.
+
+Para comprobarlo, abrir `http://<ip-vm-front>` y ver que el listado de procesos carga.
