@@ -1,77 +1,61 @@
-# FrontAngular
+# Procesos BPMN (frontend)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.2.1.
+Cliente web para modelar procesos BPMN de varias empresas. Consume la API REST del backend, que está en [ProyectoWebBack](https://github.com/Siftings/ProyectoWebBack).
 
-## Development server
+## Stack
 
-To start a local development server, run:
+Angular, CSS propio, nginx y Docker.
 
-```bash
-ng serve
-```
+## Requisitos
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+- Node.js y npm
+- Java, para el backend
+- Docker (opcional)
 
-## Code scaffolding
+## Backend
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+En el repositorio del backend:
 
 ```bash
-ng generate --help
+git switch feat/modo-sin-jwt
+JWT_HABILITADO=false ./mvnw spring-boot:run
 ```
 
-## Building
+Arranca en el puerto 8080 con datos demo. En esta entrega no hay login: el backend atiende todas las peticiones como un usuario fijo, `admin@demo.com` por defecto. Swagger queda en `http://localhost:8080/swagger-ui/index.html`.
 
-To build the project run:
+Usuarios demo: `admin@demo.com` y `admin@beta.com`, los dos con la clave `admin123`. Son de empresas distintas. Los datos demo aparecen justo después del arranque, así que si la primera petición da 401, hay que repetirla.
+
+## Frontend
 
 ```bash
-ng build
+npm install
+npm start
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Abrir `http://localhost:4200`. La dirección del backend y el usuario salen de `public/config.json`:
 
-## Running unit tests
+```json
+{
+  "apiUrl": "http://localhost:8080/api/v1",
+  "usuarioFijo": { "email": "admin@demo.com", "rolAcceso": "ADMINISTRADOR" }
+}
+```
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+## Cambiar de usuario
+
+Reiniciar el backend con `USUARIO_FIJO=admin@beta.com` y poner ese mismo correo, con su rol, en `public/config.json`. El rol puede ser `ADMINISTRADOR`, `EDITOR` o `SOLO_LECTURA`.
+
+## Build y pruebas
 
 ```bash
-ng test
+npm run build
+npm test
 ```
 
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
-
-## Despliegue con Docker
-
-El front y el back pueden estar en máquinas distintas. La imagen sirve la app con nginx y crea el archivo de
-configuración al arrancar, así la dirección del back no se fija al compilar.
-
-Construir la imagen:
+## Docker
 
 ```bash
 docker build -t frontangular .
-```
-
-Ejecutarla en la máquina del front:
-
-```bash
 docker run -p 80:80 \
   -e API_URL=http://<ip-vm-back>:8080/api/v1 \
   -e USUARIO_FIJO_EMAIL=admin@demo.com \
@@ -79,21 +63,8 @@ docker run -p 80:80 \
   frontangular
 ```
 
-Las tres variables son obligatorias. Si falta alguna, el contenedor se detiene y dice cuál. El rol puede ser
-`ADMINISTRADOR`, `EDITOR` o `SOLO_LECTURA`.
+Las tres variables son obligatorias. `API_URL` la usa el navegador de quien abre la app, así que debe ser una dirección a la que ese navegador llegue. El backend también necesita configuración (`CORS_ALLOWED_ORIGINS`, `JWT_HABILITADO` y `USUARIO_FIJO`); está explicada en la página de despliegue de la wiki.
 
-`API_URL` la usa el navegador de quien abre la app, no el contenedor. Debe ser una dirección a la que ese navegador
-llegue.
+## Documentación
 
-En la máquina del back hay que definir estas variables antes de arrancarlo:
-
-| Variable | Valor |
-|---|---|
-| `CORS_ALLOWED_ORIGINS` | `http://<ip-vm-front>` |
-| `JWT_HABILITADO` | `false` |
-| `USUARIO_FIJO` | el mismo correo que `USUARIO_FIJO_EMAIL` |
-
-Ambas máquinas deben usar HTTP. Si el front se sirviera por HTTPS, el navegador bloquearía las llamadas a un back en
-HTTP.
-
-Para comprobarlo, abrir `http://<ip-vm-front>` y ver que el listado de procesos carga.
+Arquitectura del front, Swagger, Postman y despliegue en dos máquinas están en la [wiki](https://github.com/Siftings/ProyectoWebFront/wiki).
