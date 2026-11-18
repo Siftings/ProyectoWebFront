@@ -1,0 +1,26 @@
+<dialog
+  #dialogo
+  aria-labelledby="sesion-aviso-titulo"
+  aria-describedby="sesion-aviso-texto"
+  (cancel)="$event.preventDefault()"
+  (close)="sincronizar()"
+>
+  <h2 id="sesion-aviso-titulo">Tu sesión está a punto de finalizar</h2>
+  <p id="sesion-aviso-texto">Haz clic en «Continuar sesión» para seguir trabajando.</p>
+  @if (sesion.mostrarAviso() && sesion.segundosRestantes(); as segundos) {
+    <p>La sesión se cerrará en {{ segundos }} {{ segundos === 1 ? 'segundo' : 'segundos' }}.</p>
+  }
+  <app-alerta-error [mensaje]="sesion.error()" />
+  <div class="acciones">
+    <button type="button" (click)="cerrarSesion.emit()">Cerrar sesión</button>
+    <button
+      type="button"
+      class="btn-primario"
+      autofocus
+      [disabled]="sesion.renovando()"
+      (click)="sesion.continuar()"
+    >
+      {{ sesion.renovando() ? 'Renovando…' : 'Continuar sesión' }}
+    </button>
+  </div>
+</dialog>
