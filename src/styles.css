@@ -220,6 +220,22 @@ th {
   width: 100%;
 }
 
+.pagina-publica {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-8) var(--space-4);
+}
+
+.pagina-publica .formulario {
+  width: 100%;
+}
+
+.enlace-alterno {
+  margin: var(--space-4) 0 0;
+  text-align: center;
+  font-size: var(--text-sm);
+}
+
 .error-campo {
   margin-top: var(--space-1);
   color: var(--color-error);

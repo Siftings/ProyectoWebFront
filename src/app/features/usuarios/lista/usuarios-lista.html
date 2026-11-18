@@ -33,14 +33,14 @@
             <tr>
               <td>
                 {{ usuario.nombre }}
-                @if (actual.esUsuarioActual(usuario.email)) {
+                @if (actual.esUsuarioActual(usuario.id)) {
                   (tú)
                 }
               </td>
               <td>{{ usuario.email }}</td>
               <td>{{ etiquetasRol[usuario.rolAcceso] }}</td>
               <td class="acciones">
-                @if (actual.esUsuarioActual(usuario.email)) {
+                @if (actual.esUsuarioActual(usuario.id)) {
                   —
                 } @else {
                   <a class="btn-enlace" [routerLink]="['/usuarios', usuario.id, 'editar']">Editar</a>

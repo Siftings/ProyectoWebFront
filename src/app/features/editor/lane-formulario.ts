@@ -15,7 +15,7 @@ import { finalize } from 'rxjs';
 import { detalleError, erroresFormulario } from '../../core/errors/problem-detail';
 import { LanesService } from '../../core/services/lanes.service';
 import { RolesService } from '../../core/services/roles.service';
-import { UsuarioActualService } from '../../core/services/usuario-actual.service';
+import { AuthService } from '../../core/services/auth.service';
 import { LaneRequest, LaneResponse } from '../../models/pool-lane';
 import { RolProcesoVistaResponse } from '../../models/rol-proceso';
 import { AlertaError } from '../../shared/alerta-error/alerta-error';
@@ -34,7 +34,7 @@ export class LaneFormulario {
   readonly guardado = output<number>();
   readonly cancelar = output<void>();
 
-  protected readonly esAdmin = inject(UsuarioActualService).esAdmin;
+  protected readonly esAdmin = inject(AuthService).esAdmin;
 
   readonly form = inject(FormBuilder).group({
     nombre: ['', [Validators.required, Validators.pattern(/\S/), Validators.maxLength(255)]],

@@ -7,7 +7,7 @@ import { detalleError } from '../../../core/errors/problem-detail';
 import { CompartidosService } from '../../../core/services/compartidos.service';
 import { EmpresasService } from '../../../core/services/empresas.service';
 import { ProcesosService } from '../../../core/services/procesos.service';
-import { UsuarioActualService } from '../../../core/services/usuario-actual.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { EmpresaResumenResponse } from '../../../models/auth';
 import { ProcesoCompartidoResponse } from '../../../models/compartido';
 import { ProcesoResponse } from '../../../models/proceso';
@@ -28,7 +28,7 @@ export class ProcesoCompartir {
   private readonly router = inject(Router);
   private busqueda: Subscription | null = null;
 
-  protected readonly usuario = inject(UsuarioActualService);
+  protected readonly usuario = inject(AuthService);
   protected readonly id = Number(inject(ActivatedRoute).snapshot.paramMap.get('id'));
 
   readonly form = inject(FormBuilder).nonNullable.group({

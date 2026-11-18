@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
-import { ActivatedRoute, convertToParamMap } from '@angular/router';
+import { ActivatedRoute, Router, convertToParamMap, provideRouter } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { InvitacionesService } from '../../core/services/invitaciones.service';
 import { UsuarioResponse } from '../../models/auth';
@@ -18,37 +18,36 @@ function crear(aceptar: ReturnType<typeof vi.fn>) {
   TestBed.configureTestingModule({
     imports: [Invitacion],
     providers: [
+      provideRouter([]),
       { provide: InvitacionesService, useValue: { aceptar } },
       { provide: ActivatedRoute, useValue: { snapshot: { paramMap: convertToParamMap({ token: 'tok-1' }) } } },
     ],
   });
+  const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
   const fixture = TestBed.createComponent(Invitacion);
   fixture.detectChanges();
-  return fixture;
+  return { fixture, navigate };
 }
 
 describe('Invitacion', () => {
   it('no envía si el formulario es inválido', () => {
     const aceptar = vi.fn();
-    const componente = crear(aceptar).componentInstance;
+    const componente = crear(aceptar).fixture.componentInstance;
     componente.form.setValue({ nombre: 'Nuevo', password: '1234567' });
     componente.enviar();
     expect(aceptar).not.toHaveBeenCalled();
   });
 
-  it('acepta con el token de la ruta y muestra el correo de la cuenta', () => {
+  it('acepta con el token de la ruta y lleva al login con el correo de la cuenta', () => {
     const aceptar = vi.fn(() => of(USUARIO));
-    const fixture = crear(aceptar);
+    const { fixture, navigate } = crear(aceptar);
     const componente = fixture.componentInstance;
     componente.form.setValue({ nombre: ' Nuevo ', password: 'secreta123' });
 
     componente.enviar();
-    fixture.detectChanges();
 
     expect(aceptar).toHaveBeenCalledWith('tok-1', { nombre: 'Nuevo', password: 'secreta123' });
-    const elemento = fixture.nativeElement as HTMLElement;
-    expect(elemento.querySelector('.alerta-exito')?.textContent).toContain('Cuenta creada para nuevo@demo.com.');
-    expect(elemento.querySelector('form')).toBeNull();
+    expect(navigate).toHaveBeenCalledWith(['/login'], { queryParams: { email: 'nuevo@demo.com' } });
   });
 
   it('un 404 muestra el detail del backend', () => {
@@ -62,7 +61,7 @@ describe('Invitacion', () => {
           }),
       ),
     );
-    const fixture = crear(aceptar);
+    const { fixture, navigate } = crear(aceptar);
     const componente = fixture.componentInstance;
     componente.form.setValue({ nombre: 'Nuevo', password: 'secreta123' });
 
@@ -70,7 +69,7 @@ describe('Invitacion', () => {
     fixture.detectChanges();
 
     expect(componente.error()).toBe(detail);
-    expect(componente.creado()).toBeNull();
+    expect(navigate).not.toHaveBeenCalled();
     expect((fixture.nativeElement as HTMLElement).querySelector('.alerta-error')?.textContent).toContain(detail);
   });
 });

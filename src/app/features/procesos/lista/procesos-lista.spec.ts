@@ -4,7 +4,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { ProcesosService } from '../../../core/services/procesos.service';
-import { UsuarioActualService } from '../../../core/services/usuario-actual.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { PageResponse } from '../../../models/comun';
 import { RolAcceso } from '../../../models/enums';
 import { ProcesoResponse } from '../../../models/proceso';
@@ -35,7 +35,7 @@ function crear(rol: RolAcceso, servicio: Partial<Record<keyof ProcesosService, u
       provideRouter([]),
       { provide: ProcesosService, useValue: servicio },
       {
-        provide: UsuarioActualService,
+        provide: AuthService,
         useValue: { esAdmin: signal(esAdmin), puedeEditar: signal(esAdmin || rol === 'EDITOR') },
       },
     ],

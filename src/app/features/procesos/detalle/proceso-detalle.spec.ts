@@ -4,7 +4,7 @@ import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router, provideRouter } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { ProcesosService } from '../../../core/services/procesos.service';
-import { UsuarioActualService } from '../../../core/services/usuario-actual.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { RolAcceso } from '../../../models/enums';
 import { ProcesoDetalleResponse } from '../../../models/proceso';
 import { ProcesoDetalle } from './proceso-detalle';
@@ -36,7 +36,7 @@ function crear(servicio: Partial<Record<keyof ProcesosService, unknown>>, id = '
     providers: [
       provideRouter([]),
       { provide: ProcesosService, useValue: servicio },
-      { provide: UsuarioActualService, useValue: { puedeEditar: signal(rol !== 'SOLO_LECTURA') } },
+      { provide: AuthService, useValue: { puedeEditar: signal(rol !== 'SOLO_LECTURA') } },
       { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => id } } } },
     ],
   });

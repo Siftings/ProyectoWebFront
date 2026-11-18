@@ -4,7 +4,7 @@ import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { detalleError } from '../../../core/errors/problem-detail';
-import { UsuarioActualService } from '../../../core/services/usuario-actual.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { UsuariosService } from '../../../core/services/usuarios.service';
 import { UsuarioResponse } from '../../../models/auth';
 import { ETIQUETAS_ROL_ACCESO, RolAcceso } from '../../../models/enums';
@@ -19,7 +19,7 @@ const MENSAJE_PROPIO = 'No puedes cambiar tu propio rol ni desactivarte.';
 })
 export class UsuarioEditar {
   private readonly usuarios = inject(UsuariosService);
-  private readonly actual = inject(UsuarioActualService);
+  private readonly actual = inject(AuthService);
   private readonly router = inject(Router);
   private readonly id = Number(inject(ActivatedRoute).snapshot.paramMap.get('id'));
 
@@ -45,7 +45,7 @@ export class UsuarioEditar {
       .pipe(finalize(() => this.cargando.set(false)))
       .subscribe({
         next: (usuario) => {
-          if (this.actual.esUsuarioActual(usuario.email)) {
+          if (this.actual.esUsuarioActual(usuario.id)) {
             this.error.set(MENSAJE_PROPIO);
             return;
           }
@@ -61,7 +61,7 @@ export class UsuarioEditar {
     if (!usuario) {
       return;
     }
-    if (this.actual.esUsuarioActual(usuario.email)) {
+    if (this.actual.esUsuarioActual(usuario.id)) {
       this.error.set(MENSAJE_PROPIO);
       return;
     }

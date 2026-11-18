@@ -1,8 +1,6 @@
-<div class="tarjeta formulario">
-  <h1>Aceptar invitación</h1>
-  @if (creado(); as usuario) {
-    <p class="alerta alerta-exito" role="status">Cuenta creada para {{ usuario.email }}.</p>
-  } @else {
+<main class="pagina-publica">
+  <div class="tarjeta formulario">
+    <h1>Aceptar invitación</h1>
     <form [formGroup]="form" (ngSubmit)="enviar()" novalidate>
       <p>Elige tu nombre y una contraseña para crear tu cuenta.</p>
 
@@ -20,7 +18,12 @@
 
       <div class="campo">
         <label for="password">Contraseña</label>
-        <input id="password" type="password" formControlName="password" autocomplete="new-password" />
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          autocomplete="new-password"
+        />
         <app-error-campo
           [mostrar]="form.controls.password.touched && form.controls.password.invalid"
           [mensaje]="
@@ -36,5 +39,6 @@
         {{ enviando() ? 'Creando…' : 'Crear cuenta' }}
       </button>
     </form>
-  }
-</div>
+    <p class="enlace-alterno"><a routerLink="/login">Ya tengo cuenta</a></p>
+  </div>
+</main>

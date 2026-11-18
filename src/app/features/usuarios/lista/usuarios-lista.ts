@@ -2,7 +2,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { detalleError } from '../../../core/errors/problem-detail';
-import { UsuarioActualService } from '../../../core/services/usuario-actual.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { UsuariosService } from '../../../core/services/usuarios.service';
 import { UsuarioResponse } from '../../../models/auth';
 import { ETIQUETAS_ROL_ACCESO } from '../../../models/enums';
@@ -18,7 +18,7 @@ import { ConfirmDialog } from '../../../shared/confirm-dialog/confirm-dialog';
 export class UsuariosLista {
   private readonly usuarios = inject(UsuariosService);
 
-  protected readonly actual = inject(UsuarioActualService);
+  protected readonly actual = inject(AuthService);
   protected readonly etiquetasRol = ETIQUETAS_ROL_ACCESO;
 
   readonly lista = signal<UsuarioResponse[] | null>(null);
@@ -56,7 +56,7 @@ export class UsuariosLista {
     this.pendiente.set(null);
     this.aviso.set(null);
     this.error.set(null);
-    if (this.actual.esUsuarioActual(usuario.email)) {
+    if (this.actual.esUsuarioActual(usuario.id)) {
       this.error.set('No puedes desactivarte a ti mismo.');
       return;
     }
