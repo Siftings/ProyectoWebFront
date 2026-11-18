@@ -1,7 +1,6 @@
 import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { Router } from '@angular/router';
 import { ConfigService } from '../config/config.service';
 import { AuthService } from '../services/auth.service';
 import { authInterceptor } from './auth.interceptor';
@@ -9,19 +8,16 @@ import { authInterceptor } from './auth.interceptor';
 describe('authInterceptor', () => {
   let http: HttpClient;
   let ctrl: HttpTestingController;
-  let auth: { token: ReturnType<typeof vi.fn>; limpiar: ReturnType<typeof vi.fn> };
-  let router: { navigate: ReturnType<typeof vi.fn>; url: string };
+  let auth: { token: ReturnType<typeof vi.fn>; cerrarPorVencimiento: ReturnType<typeof vi.fn> };
 
   beforeEach(() => {
-    auth = { token: vi.fn().mockReturnValue('tok'), limpiar: vi.fn() };
-    router = { navigate: vi.fn(), url: '/procesos/42/diagrama' };
+    auth = { token: vi.fn().mockReturnValue('tok'), cerrarPorVencimiento: vi.fn() };
     TestBed.configureTestingModule({
       providers: [
         provideHttpClient(withInterceptors([authInterceptor])),
         provideHttpClientTesting(),
         { provide: ConfigService, useValue: { apiUrl: 'http://api' } },
         { provide: AuthService, useValue: auth },
-        { provide: Router, useValue: router },
       ],
     });
     http = TestBed.inject(HttpClient);
@@ -59,36 +55,37 @@ describe('authInterceptor', () => {
     req.flush([]);
   });
 
-  it('un 401 limpia la sesión, va al login y relanza el error', () => {
+  it('un 401 cierra la sesión por vencimiento y relanza el error', () => {
     let status = 0;
     http.get('http://api/procesos').subscribe({ error: (e) => (status = e.status) });
     ctrl.expectOne('http://api/procesos').flush(null, { status: 401, statusText: 'Unauthorized' });
-    expect(auth.limpiar).toHaveBeenCalled();
-    expect(router.navigate).toHaveBeenCalledWith(['/login'], {
-      queryParams: { returnUrl: '/procesos/42/diagrama' },
-    });
+    expect(auth.cerrarPorVencimiento).toHaveBeenCalledTimes(1);
     expect(status).toBe(401);
+  });
+
+  it('un 401 del refresh también cierra la sesión', () => {
+    http.post('http://api/auth/refresh', null).subscribe({ error: () => undefined });
+    ctrl.expectOne('http://api/auth/refresh').flush(null, { status: 401, statusText: 'Unauthorized' });
+    expect(auth.cerrarPorVencimiento).toHaveBeenCalledTimes(1);
   });
 
   it('un 401 del login no limpia ni navega, pero relanza el error', () => {
     let status = 0;
     http.post('http://api/auth/login', {}).subscribe({ error: (e) => (status = e.status) });
     ctrl.expectOne('http://api/auth/login').flush(null, { status: 401, statusText: 'Unauthorized' });
-    expect(auth.limpiar).not.toHaveBeenCalled();
-    expect(router.navigate).not.toHaveBeenCalled();
+    expect(auth.cerrarPorVencimiento).not.toHaveBeenCalled();
     expect(status).toBe(401);
   });
 
   it('un 401 del logout no navega (lo hace quien cierra la sesión)', () => {
     http.post('http://api/auth/logout', null).subscribe({ error: () => undefined });
     ctrl.expectOne('http://api/auth/logout').flush(null, { status: 401, statusText: 'Unauthorized' });
-    expect(router.navigate).not.toHaveBeenCalled();
+    expect(auth.cerrarPorVencimiento).not.toHaveBeenCalled();
   });
 
   it('otros errores no tocan la sesión', () => {
     http.get('http://api/procesos').subscribe({ error: () => undefined });
     ctrl.expectOne('http://api/procesos').flush(null, { status: 403, statusText: 'Forbidden' });
-    expect(auth.limpiar).not.toHaveBeenCalled();
-    expect(router.navigate).not.toHaveBeenCalled();
+    expect(auth.cerrarPorVencimiento).not.toHaveBeenCalled();
   });
 });
