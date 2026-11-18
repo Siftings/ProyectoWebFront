@@ -9,7 +9,7 @@ import { PermisosEstructuraService } from '../../core/services/permisos-estructu
 import { NodosService } from '../../core/services/nodos.service';
 import { PoolsService } from '../../core/services/pools.service';
 import { ProcesosService } from '../../core/services/procesos.service';
-import { UsuarioActualService } from '../../core/services/usuario-actual.service';
+import { AuthService } from '../../core/services/auth.service';
 import { EstadoProceso, RolAcceso } from '../../models/enums';
 import { ProcesoDiagramaResponse } from '../../models/proceso';
 import { EditorStateService } from './editor-state.service';
@@ -139,7 +139,7 @@ describe('EditorStateService', () => {
         },
         { provide: PermisosEstructuraService, useValue: { listar: listarPermisosMock } },
         {
-          provide: UsuarioActualService,
+          provide: AuthService,
           useValue: { puedeEditar, rol, esAdmin: () => rol() === 'ADMINISTRADOR' },
         },
       ],
@@ -251,7 +251,7 @@ describe('EditorStateService', () => {
           { provide: NodosService, useValue: {} },
           { provide: LanesService, useValue: {} },
           { provide: PermisosEstructuraService, useValue: { listar: listarPermisosMock } },
-          { provide: UsuarioActualService, useValue: { puedeEditar, rol, esAdmin: () => true } },
+          { provide: AuthService, useValue: { puedeEditar, rol, esAdmin: () => true } },
         ],
       });
       const e = TestBed.inject(EditorStateService);
@@ -272,7 +272,7 @@ describe('EditorStateService', () => {
           { provide: NodosService, useValue: {} },
           { provide: LanesService, useValue: {} },
           { provide: PermisosEstructuraService, useValue: { listar: listarPermisosMock } },
-          { provide: UsuarioActualService, useValue: { puedeEditar, rol, esAdmin: () => false } },
+          { provide: AuthService, useValue: { puedeEditar, rol, esAdmin: () => false } },
         ],
       });
       const e = TestBed.inject(EditorStateService);

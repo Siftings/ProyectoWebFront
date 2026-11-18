@@ -10,7 +10,7 @@ import { PermisosEstructuraService } from '../../core/services/permisos-estructu
 import { KindNodo, NodosService } from '../../core/services/nodos.service';
 import { PoolsService } from '../../core/services/pools.service';
 import { ProcesosService } from '../../core/services/procesos.service';
-import { UsuarioActualService } from '../../core/services/usuario-actual.service';
+import { AuthService } from '../../core/services/auth.service';
 import { ArcoResponse } from '../../models/arco';
 import { MensajeResponse } from '../../models/mensaje';
 import { PermisoEstructuraResponse } from '../../models/permisos';
@@ -61,7 +61,7 @@ export class EditorStateService {
   private readonly arcos = inject(ArcosService);
   private readonly mensajesApi = inject(MensajesService);
   private readonly permisosApi = inject(PermisosEstructuraService);
-  private readonly usuario = inject(UsuarioActualService);
+  private readonly usuario = inject(AuthService);
   private readonly peticiones = new Subject<{ id: number; limpiar: boolean }>();
 
   readonly diagrama = signal<ProcesoDiagramaResponse | null>(null);
@@ -88,7 +88,7 @@ export class EditorStateService {
   readonly soloLectura = computed(() => this.motivoSoloLectura() !== null);
 
   readonly permisos = computed(() =>
-    permisosEditor(this.usuario.rol(), this.filasPermisos(), this.soloLectura()),
+    permisosEditor(this.usuario.rol() ?? 'SOLO_LECTURA', this.filasPermisos(), this.soloLectura()),
   );
 
   readonly mensajes = computed(() => this.diagrama()?.mensajes ?? []);

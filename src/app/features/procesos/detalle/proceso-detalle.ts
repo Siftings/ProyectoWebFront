@@ -5,7 +5,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { detalleError } from '../../../core/errors/problem-detail';
 import { ProcesosService } from '../../../core/services/procesos.service';
-import { UsuarioActualService } from '../../../core/services/usuario-actual.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { ProcesoDetalleResponse } from '../../../models/proceso';
 import { AlertaError } from '../../../shared/alerta-error/alerta-error';
 import { EstadoBadge } from '../../../shared/estado-badge/estado-badge';
@@ -21,7 +21,7 @@ export class ProcesoDetalle {
   private readonly router = inject(Router);
   private readonly idParam = inject(ActivatedRoute).snapshot.paramMap.get('id');
 
-  protected readonly usuario = inject(UsuarioActualService);
+  protected readonly usuario = inject(AuthService);
   protected readonly id = Number(this.idParam);
 
   readonly detalle = signal<ProcesoDetalleResponse | null>(null);

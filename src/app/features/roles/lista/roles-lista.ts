@@ -6,7 +6,7 @@ import { RouterLink } from '@angular/router';
 import { EMPTY, Subject, catchError, map, switchMap } from 'rxjs';
 import { detalleError } from '../../../core/errors/problem-detail';
 import { RolesService } from '../../../core/services/roles.service';
-import { UsuarioActualService } from '../../../core/services/usuario-actual.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { PageResponse } from '../../../models/comun';
 import { RolProcesoConsultaResponse } from '../../../models/rol-proceso';
 import { AlertaError } from '../../../shared/alerta-error/alerta-error';
@@ -28,7 +28,7 @@ export class RolesLista {
   private readonly roles = inject(RolesService);
   private readonly consultas = new Subject<Consulta>();
 
-  protected readonly usuario = inject(UsuarioActualService);
+  protected readonly usuario = inject(AuthService);
 
   readonly form = inject(FormBuilder).nonNullable.group({ nombre: [''] });
   readonly nombre = signal('');

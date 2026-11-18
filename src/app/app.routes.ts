@@ -1,9 +1,27 @@
 import { Routes } from '@angular/router';
+import { authGuard, rolGuard } from './core/guards/auth.guard';
+import { RolAcceso } from './models/enums';
+
+const SOLO_ADMIN = { canActivate: [rolGuard], data: { roles: ['ADMINISTRADOR'] as RolAcceso[] } };
 
 export const routes: Routes = [
   {
+    path: 'login',
+    loadComponent: () => import('./features/auth/login/login').then((m) => m.Login),
+  },
+  {
+    path: 'registro',
+    loadComponent: () => import('./features/registro/registro').then((m) => m.Registro),
+  },
+  {
+    path: 'invitacion/:token',
+    loadComponent: () => import('./features/invitacion/invitacion').then((m) => m.Invitacion),
+  },
+  {
     path: '',
     loadComponent: () => import('./core/layout/layout').then((m) => m.Layout),
+    canActivate: [authGuard],
+    canActivateChild: [authGuard],
     children: [
       {
         path: '',
@@ -59,21 +77,25 @@ export const routes: Routes = [
       },
       {
         path: 'roles/nuevo',
+        ...SOLO_ADMIN,
         loadComponent: () =>
           import('./features/roles/formulario/rol-formulario').then((m) => m.RolFormulario),
       },
       {
         path: 'roles/:id/editar',
+        ...SOLO_ADMIN,
         loadComponent: () =>
           import('./features/roles/formulario/rol-formulario').then((m) => m.RolFormulario),
       },
       {
         path: 'usuarios',
+        ...SOLO_ADMIN,
         loadComponent: () =>
           import('./features/usuarios/lista/usuarios-lista').then((m) => m.UsuariosLista),
       },
       {
         path: 'usuarios/nuevo',
+        ...SOLO_ADMIN,
         loadComponent: () =>
           import('./features/usuarios/formulario/usuario-formulario').then(
             (m) => m.UsuarioFormulario,
@@ -81,26 +103,21 @@ export const routes: Routes = [
       },
       {
         path: 'usuarios/invitar',
+        ...SOLO_ADMIN,
         loadComponent: () =>
           import('./features/usuarios/invitar/usuario-invitar').then((m) => m.UsuarioInvitar),
       },
       {
         path: 'usuarios/:id/editar',
+        ...SOLO_ADMIN,
         loadComponent: () =>
           import('./features/usuarios/editar/usuario-editar').then((m) => m.UsuarioEditar),
       },
       {
         path: 'permisos',
+        ...SOLO_ADMIN,
         loadComponent: () =>
           import('./features/permisos/permisos-estructura').then((m) => m.PermisosEstructura),
-      },
-      {
-        path: 'registro',
-        loadComponent: () => import('./features/registro/registro').then((m) => m.Registro),
-      },
-      {
-        path: 'invitacion/:token',
-        loadComponent: () => import('./features/invitacion/invitacion').then((m) => m.Invitacion),
       },
     ],
   },

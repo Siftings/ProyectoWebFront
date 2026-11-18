@@ -7,7 +7,7 @@ import { RouterLink } from '@angular/router';
 import { EMPTY, Observable, Subject, catchError, map, switchMap } from 'rxjs';
 import { detalleError } from '../../../core/errors/problem-detail';
 import { FiltrosProceso, ProcesosService } from '../../../core/services/procesos.service';
-import { UsuarioActualService } from '../../../core/services/usuario-actual.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { PageResponse } from '../../../models/comun';
 import { ETIQUETAS_ESTADO_PROCESO, EstadoProceso } from '../../../models/enums';
 import { ProcesoResponse } from '../../../models/proceso';
@@ -36,7 +36,7 @@ export class ProcesosLista {
   private readonly procesos = inject(ProcesosService);
   private readonly consultas = new Subject<Consulta>();
 
-  protected readonly usuario = inject(UsuarioActualService);
+  protected readonly usuario = inject(AuthService);
   protected readonly etiquetasEstado = ETIQUETAS_ESTADO_PROCESO;
 
   readonly form = inject(FormBuilder).nonNullable.group({

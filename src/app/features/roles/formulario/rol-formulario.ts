@@ -5,7 +5,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { detalleError, erroresFormulario } from '../../../core/errors/problem-detail';
 import { RolesService } from '../../../core/services/roles.service';
-import { UsuarioActualService } from '../../../core/services/usuario-actual.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { RolProcesoRequest } from '../../../models/rol-proceso';
 import { AlertaError } from '../../../shared/alerta-error/alerta-error';
 import { ErrorCampo } from '../../../shared/error-campo/error-campo';
@@ -20,7 +20,7 @@ export class RolFormulario {
   private readonly router = inject(Router);
   private readonly idParam = inject(ActivatedRoute).snapshot.paramMap.get('id');
 
-  protected readonly esAdmin = inject(UsuarioActualService).esAdmin;
+  protected readonly esAdmin = inject(AuthService).esAdmin;
   protected readonly id = this.idParam === null ? null : Number(this.idParam);
 
   readonly form = inject(FormBuilder).nonNullable.group({
