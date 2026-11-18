@@ -18,10 +18,10 @@ En el repositorio del backend:
 
 ```bash
 git switch feat/modo-sin-jwt
-JWT_HABILITADO=false ./mvnw spring-boot:run
+./mvnw spring-boot:run
 ```
 
-Arranca en el puerto 8080 con datos demo. En esta entrega no hay login: el backend atiende todas las peticiones como un usuario fijo, `admin@demo.com` por defecto. Swagger queda en `http://localhost:8080/swagger-ui/index.html`.
+Arranca en el puerto 8080 con datos demo y con el JWT habilitado. Swagger queda en `http://localhost:8080/swagger-ui/index.html`. Sin `JWT_SECRET` el backend genera una clave al arrancar y las sesiones abiertas dejan de servir en cada reinicio; para un servidor conviene fijarla.
 
 Usuarios demo: `admin@demo.com` y `admin@beta.com`, los dos con la clave `admin123`. Son de empresas distintas. Los datos demo aparecen justo después del arranque, así que si la primera petición da 401, hay que repetirla.
 
@@ -32,18 +32,15 @@ npm install
 npm start
 ```
 
-Abrir `http://localhost:4200`. La dirección del backend y el usuario salen de `public/config.json`:
+Abrir `http://localhost:4200` e iniciar sesión con un usuario demo. La dirección del backend sale de `public/config.json`:
 
 ```json
 {
-  "apiUrl": "http://localhost:8080/api/v1",
-  "usuarioFijo": { "email": "admin@demo.com", "rolAcceso": "ADMINISTRADOR" }
+  "apiUrl": "http://localhost:8080/api/v1"
 }
 ```
 
-## Cambiar de usuario
-
-Reiniciar el backend con `USUARIO_FIJO=admin@beta.com` y poner ese mismo correo, con su rol, en `public/config.json`. El rol puede ser `ADMINISTRADOR`, `EDITOR` o `SOLO_LECTURA`.
+La sesión dura 30 minutos y se guarda en el navegador, así que recargar la página no la cierra. Cuando vence, la app vuelve al login.
 
 ## Build y pruebas
 
@@ -58,12 +55,10 @@ npm test
 docker build -t frontangular .
 docker run -p 80:80 \
   -e API_URL=http://<ip-vm-back>:8080/api/v1 \
-  -e USUARIO_FIJO_EMAIL=admin@demo.com \
-  -e USUARIO_FIJO_ROL=ADMINISTRADOR \
   frontangular
 ```
 
-Las tres variables son obligatorias. `API_URL` la usa el navegador de quien abre la app, así que debe ser una dirección a la que ese navegador llegue. El backend también necesita configuración (`CORS_ALLOWED_ORIGINS`, `JWT_HABILITADO` y `USUARIO_FIJO`); está explicada en la página de despliegue de la wiki.
+`API_URL` es obligatoria. La usa el navegador de quien abre la app, así que debe ser una dirección a la que ese navegador llegue. El backend también necesita configuración (`CORS_ALLOWED_ORIGINS` y `JWT_SECRET`); está explicada en la página de despliegue de la wiki.
 
 ## Documentación
 
