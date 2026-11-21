@@ -17,7 +17,7 @@ Angular, CSS propio, nginx y Docker.
 En el repositorio del backend:
 
 ```bash
-git switch feat/modo-sin-jwt
+git switch main
 ./mvnw spring-boot:run
 ```
 
@@ -40,7 +40,7 @@ Abrir `http://localhost:4200` e iniciar sesión con un usuario demo. La direcci�
 }
 ```
 
-La sesión dura 30 minutos y se guarda en el navegador, así que recargar la página no la cierra. Cuando vence, la app vuelve al login.
+La sesión dura 30 minutos y se guarda en el navegador, así que recargar la página no la cierra. Dos minutos antes de que venza aparece un aviso con la cuenta regresiva: "Continuar sesión" la renueva por otros 30 minutos y, si nadie responde, la app vuelve al login al llegar a cero.
 
 ## Build y pruebas
 
