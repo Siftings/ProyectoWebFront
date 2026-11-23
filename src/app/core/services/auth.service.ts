@@ -1,7 +1,8 @@
-// Sesión del usuario: login, logout y estado en signals persistido en localStorage.
+// Sesión del usuario: login, renovación, logout y estado en signals persistido en localStorage.
 import { HttpClient } from '@angular/common/http';
-import { Injectable, computed, inject, signal } from '@angular/core';
-import { Observable, catchError, map, of, tap } from 'rxjs';
+import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
+import { Observable, catchError, defer, map, of, tap } from 'rxjs';
 import { ConfigService } from '../config/config.service';
 import { LoginRequest, LoginResponse, UsuarioResponse } from '../../models/auth';
 
@@ -59,12 +60,32 @@ function leerSesionGuardada(): Sesion | null {
 export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly config = inject(ConfigService);
+  private readonly router = inject(Router);
   private readonly sesion = signal<Sesion | null>(leerSesionGuardada());
 
   readonly usuario = computed(() => this.sesion()?.usuario ?? null);
+  readonly expiraEn = computed(() => this.sesion()?.expiraEn ?? null);
   readonly rol = computed(() => this.usuario()?.rolAcceso ?? null);
   readonly esAdmin = computed(() => this.rol() === 'ADMINISTRADOR');
   readonly puedeEditar = computed(() => this.rol() === 'ADMINISTRADOR' || this.rol() === 'EDITOR');
+
+  constructor() {
+    const sincronizar = (evento: StorageEvent): void => {
+      if (evento.key !== CLAVE && evento.key !== null) {
+        return;
+      }
+      const antes = this.usuario()?.id;
+      this.sesion.set(leerSesionGuardada());
+      const despues = this.usuario()?.id;
+      if (antes !== undefined && despues === undefined) {
+        this.irAlLogin();
+      } else if (antes !== undefined && despues !== antes) {
+        this.router.navigateByUrl('/');
+      }
+    };
+    window.addEventListener('storage', sincronizar);
+    inject(DestroyRef).onDestroy(() => window.removeEventListener('storage', sincronizar));
+  }
 
   token(): string | null {
     const sesion = this.sesion();
@@ -87,18 +108,11 @@ export class AuthService {
   }
 
   login(req: LoginRequest): Observable<UsuarioResponse> {
-    return this.http.post<LoginResponse>(`${this.config.apiUrl}/auth/login`, req).pipe(
-      tap((resp) => {
-        const sesion: Sesion = {
-          token: resp.accessToken,
-          usuario: resp.usuario,
-          expiraEn: Date.now() + resp.expiresIn * 1000,
-        };
-        this.sesion.set(sesion);
-        guardarSesion(sesion);
-      }),
-      map((resp) => resp.usuario),
-    );
+    return this.abrirSesion(this.http.post<LoginResponse>(`${this.config.apiUrl}/auth/login`, req));
+  }
+
+  refrescar(): Observable<UsuarioResponse> {
+    return this.abrirSesion(this.http.post<LoginResponse>(`${this.config.apiUrl}/auth/refresh`, null));
   }
 
   logout(): Observable<void> {
@@ -112,5 +126,32 @@ export class AuthService {
   limpiar(): void {
     this.sesion.set(null);
     borrarSesionGuardada();
+  }
+
+  cerrarPorVencimiento(): void {
+    this.limpiar();
+    this.irAlLogin();
+  }
+
+  private irAlLogin(): void {
+    this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.url } });
+  }
+
+  private abrirSesion(respuesta: Observable<LoginResponse>): Observable<UsuarioResponse> {
+    return defer(() => {
+      const enviadaEn = Date.now();
+      return respuesta.pipe(
+        tap((resp) => {
+          const sesion: Sesion = {
+            token: resp.accessToken,
+            usuario: resp.usuario,
+            expiraEn: enviadaEn + resp.expiresIn * 1000,
+          };
+          this.sesion.set(sesion);
+          guardarSesion(sesion);
+        }),
+        map((resp) => resp.usuario),
+      );
+    });
   }
 }

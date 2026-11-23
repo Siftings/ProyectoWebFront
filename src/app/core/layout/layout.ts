@@ -3,6 +3,7 @@ import { Component, computed, inject } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { ETIQUETAS_ROL_ACCESO, RolAcceso } from '../../models/enums';
 import { AuthService } from '../services/auth.service';
+import { SesionAviso } from './sesion-aviso/sesion-aviso';
 
 interface EnlaceMenu {
   texto: string;
@@ -19,7 +20,7 @@ const MENU: EnlaceMenu[] = [
 ];
 
 @Component({
-  imports: [RouterLink, RouterLinkActive, RouterOutlet],
+  imports: [RouterLink, RouterLinkActive, RouterOutlet, SesionAviso],
   selector: 'app-layout',
   styleUrl: './layout.css',
   templateUrl: './layout.html',
