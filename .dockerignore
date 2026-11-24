@@ -6,3 +6,6 @@ dist
 .playwright-mcp
 Dockerfile
 .dockerignore
+.env
+.env.example
+docker-compose.yml
