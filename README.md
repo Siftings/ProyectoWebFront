@@ -60,6 +60,21 @@ docker run -p 80:80 \
 
 `API_URL` es obligatoria. La usa el navegador de quien abre la app, así que debe ser una dirección a la que ese navegador llegue. El backend también necesita configuración (`CORS_ALLOWED_ORIGINS` y `JWT_SECRET`); está explicada en la página de despliegue de la wiki.
 
+## Docker Compose (una sola máquina)
+
+Levanta la base de datos (PostgreSQL), el backend y el frontend con un solo comando. Necesita Docker con Compose y los dos repositorios clonados en la misma carpeta, con el backend en `Beta-back`, porque el compose lo construye desde `../Beta-back`.
+
+```bash
+cp .env.example .env    # completar DB_PASSWORD y JWT_SECRET
+docker compose up -d --build
+```
+
+Abrir `http://localhost` e iniciar sesión con un usuario demo. El primer build tarda varios minutos porque el backend corre sus pruebas al compilar. Swagger queda en `http://localhost:8080/swagger-ui/index.html`.
+
+En una máquina virtual, poner en `.env` la IP o el nombre con el que se abre la app (`HOST=<ip-vm>`) y abrir los puertos 80 y 8080. La app se abre con esa misma dirección, porque el backend solo acepta peticiones que vengan de `http://<HOST>`.
+
+`docker compose down` apaga todo y conserva los datos. `docker compose down -v` borra también la base, que se crea de nuevo con los usuarios demo en el siguiente arranque.
+
 ## Documentación
 
 Arquitectura del front, Swagger, Postman y despliegue en dos máquinas están en la [wiki](https://github.com/Siftings/ProyectoWebFront/wiki).

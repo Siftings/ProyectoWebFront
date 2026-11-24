@@ -1,0 +1,49 @@
+# Base de datos, back y front en una sola máquina. Requiere ../Beta-back y un .env (ver .env.example).
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: procesos
+      POSTGRES_USER: procesos
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Falta DB_PASSWORD en .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U procesos -d procesos"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  back:
+    build: ../Beta-back
+    image: procesos-back
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: prod,default
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      DB_HOST: db
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET:?Falta JWT_SECRET en .env}
+      CORS_ALLOWED_ORIGINS: http://${HOST:-localhost}
+      SPRINGDOC_API_DOCS_ENABLED: "true"
+      SPRINGDOC_SWAGGER_UI_ENABLED: "true"
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+  front:
+    build: .
+    image: frontangular
+    depends_on:
+      - back
+    environment:
+      API_URL: http://${HOST:-localhost}:8080/api/v1
+    ports:
+      - "80:80"
+    restart: unless-stopped
+
+volumes:
+  pgdata:
