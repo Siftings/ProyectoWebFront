@@ -1,0 +1,330 @@
+{
+  "id": "51b53b2f-18c2-403d-8c67-1b1523f77449",
+  "version": "2.0",
+  "name": "01-sesion",
+  "url": "http://localhost",
+  "tests": [
+    {
+      "id": "46965126-cc42-4365-8205-9fb80ee43553",
+      "name": "F01 Login correcto lleva al inicio",
+      "commands": [
+        {
+          "id": "0adab91e-0d75-4c6d-8728-4a15cd244337",
+          "comment": "",
+          "command": "open",
+          "target": "/login",
+          "targets": [],
+          "value": ""
+        },
+        {
+          "id": "0f6e429f-8241-4755-95c0-4240e7491e54",
+          "comment": "",
+          "command": "waitForElementVisible",
+          "target": "id=email",
+          "targets": [],
+          "value": "10000"
+        },
+        {
+          "id": "9a44efde-68ef-4cbd-a8fe-825cdcaaf3be",
+          "comment": "",
+          "command": "type",
+          "target": "id=email",
+          "targets": [],
+          "value": "admin@demo.com"
+        },
+        {
+          "id": "ea3057a4-dbcf-48aa-8d86-f45e4435b9b3",
+          "comment": "",
+          "command": "type",
+          "target": "id=password",
+          "targets": [],
+          "value": "admin123"
+        },
+        {
+          "id": "ccf8c9b3-70b3-4994-8e01-ab8054780a61",
+          "comment": "",
+          "command": "click",
+          "target": "css=button[type=submit]",
+          "targets": [],
+          "value": ""
+        },
+        {
+          "id": "e00051a8-ee65-482c-8c30-c76d78512a34",
+          "comment": "",
+          "command": "waitForElementVisible",
+          "target": "xpath=//button[normalize-space()='Cerrar sesión']",
+          "targets": [],
+          "value": "10000"
+        },
+        {
+          "id": "6c7ce509-53c8-4de6-b88b-2072263b456d",
+          "comment": "",
+          "command": "executeScript",
+          "target": "return location.pathname",
+          "targets": [],
+          "value": "ruta"
+        },
+        {
+          "id": "54005ace-158d-43bd-954e-e30aa331cc80",
+          "comment": "",
+          "command": "assert",
+          "target": "ruta",
+          "targets": [],
+          "value": "/"
+        }
+      ]
+    },
+    {
+      "id": "26e88521-4775-4a70-b27f-c562721a11f9",
+      "name": "F02 Login con clave incorrecta muestra el error",
+      "commands": [
+        {
+          "id": "4a923f29-98ed-45ed-9e43-3dd524274e1b",
+          "comment": "",
+          "command": "open",
+          "target": "/login",
+          "targets": [],
+          "value": ""
+        },
+        {
+          "id": "3d2d83fe-79bf-423d-8934-e25643bd3738",
+          "comment": "",
+          "command": "waitForElementVisible",
+          "target": "id=email",
+          "targets": [],
+          "value": "10000"
+        },
+        {
+          "id": "17eaaf81-e84d-4960-893f-f6aa8253c5fa",
+          "comment": "",
+          "command": "type",
+          "target": "id=email",
+          "targets": [],
+          "value": "admin@demo.com"
+        },
+        {
+          "id": "359fe43e-182d-4f07-ba4a-c1824646703a",
+          "comment": "",
+          "command": "type",
+          "target": "id=password",
+          "targets": [],
+          "value": "incorrecta1"
+        },
+        {
+          "id": "6ee708d5-f915-4b42-be94-89d74699e6f2",
+          "comment": "",
+          "command": "click",
+          "target": "css=button[type=submit]",
+          "targets": [],
+          "value": ""
+        },
+        {
+          "id": "97e5ce29-c8df-4556-9aa6-1a255604bd23",
+          "comment": "",
+          "command": "waitForElementVisible",
+          "target": "css=p.alerta-error",
+          "targets": [],
+          "value": "10000"
+        },
+        {
+          "id": "037bd542-0ca8-47ba-9315-893fdc32d97c",
+          "comment": "",
+          "command": "executeScript",
+          "target": "return location.pathname",
+          "targets": [],
+          "value": "ruta"
+        },
+        {
+          "id": "27d758e8-5c7b-4ddf-8a45-9a3cdc808a3c",
+          "comment": "",
+          "command": "assert",
+          "target": "ruta",
+          "targets": [],
+          "value": "/login"
+        }
+      ]
+    },
+    {
+      "id": "4da692c7-d007-4ca3-9c1d-e45855e00cb9",
+      "name": "F03 Login sin correo valida el campo",
+      "commands": [
+        {
+          "id": "771f4842-3574-47de-b4f6-2b91bdffb2c8",
+          "comment": "",
+          "command": "open",
+          "target": "/login",
+          "targets": [],
+          "value": ""
+        },
+        {
+          "id": "bf91ba28-cccf-4521-a593-b37995157bef",
+          "comment": "",
+          "command": "waitForElementVisible",
+          "target": "id=email",
+          "targets": [],
+          "value": "10000"
+        },
+        {
+          "id": "5612f2fe-ebb0-407a-b4a8-183a5106603a",
+          "comment": "",
+          "command": "click",
+          "target": "css=button[type=submit]",
+          "targets": [],
+          "value": ""
+        },
+        {
+          "id": "9f0e8a7e-d051-471e-95f2-602fc8dbf0e5",
+          "comment": "",
+          "command": "assertText",
+          "target": "css=.campo:nth-of-type(1) .error-campo",
+          "targets": [],
+          "value": "Ingresa tu correo."
+        }
+      ]
+    },
+    {
+      "id": "f7581590-b093-42f7-95a6-fb5cc65b293c",
+      "name": "F04 Ruta protegida sin sesión va al login",
+      "commands": [
+        {
+          "id": "25babc8d-7753-439f-bf50-65f3aef623df",
+          "comment": "",
+          "command": "open",
+          "target": "/procesos",
+          "targets": [],
+          "value": ""
+        },
+        {
+          "id": "373e927f-7f62-472a-ac57-cdd3b05922da",
+          "comment": "",
+          "command": "waitForElementVisible",
+          "target": "id=email",
+          "targets": [],
+          "value": "10000"
+        },
+        {
+          "id": "2919872b-a91c-476a-b1a2-0cec80dc5a7f",
+          "comment": "",
+          "command": "executeScript",
+          "target": "return location.pathname",
+          "targets": [],
+          "value": "ruta"
+        },
+        {
+          "id": "2fb5bada-7e78-46a5-95be-35263c037dd0",
+          "comment": "",
+          "command": "assert",
+          "target": "ruta",
+          "targets": [],
+          "value": "/login"
+        }
+      ]
+    },
+    {
+      "id": "8238e91b-209a-474b-851e-551e5fc943ac",
+      "name": "F05 Cerrar sesión vuelve al login",
+      "commands": [
+        {
+          "id": "1fd58225-1fdd-4630-ac7f-f1ec539920d0",
+          "comment": "",
+          "command": "open",
+          "target": "/login",
+          "targets": [],
+          "value": ""
+        },
+        {
+          "id": "a5d35c5c-b941-4e25-bacf-28877325ece5",
+          "comment": "",
+          "command": "waitForElementVisible",
+          "target": "id=email",
+          "targets": [],
+          "value": "10000"
+        },
+        {
+          "id": "e48245ac-0849-40e5-9144-acf3c8b2da00",
+          "comment": "",
+          "command": "type",
+          "target": "id=email",
+          "targets": [],
+          "value": "admin@demo.com"
+        },
+        {
+          "id": "0dad216c-a83e-4aca-8443-c66ccf46690c",
+          "comment": "",
+          "command": "type",
+          "target": "id=password",
+          "targets": [],
+          "value": "admin123"
+        },
+        {
+          "id": "c4907281-e385-41ad-b335-91a6d39f1cd8",
+          "comment": "",
+          "command": "click",
+          "target": "css=button[type=submit]",
+          "targets": [],
+          "value": ""
+        },
+        {
+          "id": "94017039-d1d8-4afe-83eb-88807e747f40",
+          "comment": "",
+          "command": "waitForElementVisible",
+          "target": "xpath=//button[normalize-space()='Cerrar sesión']",
+          "targets": [],
+          "value": "10000"
+        },
+        {
+          "id": "f82d44dd-5329-4d69-b5de-db1ed1bdb393",
+          "comment": "",
+          "command": "click",
+          "target": "xpath=//button[normalize-space()='Cerrar sesión']",
+          "targets": [],
+          "value": ""
+        },
+        {
+          "id": "e397d1eb-96da-47c4-9349-1bbeb94821a2",
+          "comment": "",
+          "command": "waitForElementVisible",
+          "target": "id=email",
+          "targets": [],
+          "value": "10000"
+        },
+        {
+          "id": "d1b6258d-3359-470c-81f6-fe6440180ba2",
+          "comment": "",
+          "command": "executeScript",
+          "target": "return location.pathname",
+          "targets": [],
+          "value": "ruta"
+        },
+        {
+          "id": "16d2d47a-e8f2-441d-9557-8b588b663a23",
+          "comment": "",
+          "command": "assert",
+          "target": "ruta",
+          "targets": [],
+          "value": "/login"
+        }
+      ]
+    }
+  ],
+  "suites": [
+    {
+      "id": "cce469d8-84cc-4d6a-ac11-266b1ac50910",
+      "name": "01-sesion",
+      "persistSession": false,
+      "parallel": false,
+      "timeout": 300,
+      "tests": [
+        "46965126-cc42-4365-8205-9fb80ee43553",
+        "26e88521-4775-4a70-b27f-c562721a11f9",
+        "4da692c7-d007-4ca3-9c1d-e45855e00cb9",
+        "f7581590-b093-42f7-95a6-fb5cc65b293c",
+        "8238e91b-209a-474b-851e-551e5fc943ac"
+      ]
+    }
+  ],
+  "urls": [
+    "http://localhost"
+  ],
+  "plugins": []
+}

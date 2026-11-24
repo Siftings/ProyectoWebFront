@@ -1,0 +1,134 @@
+{
+  "id": "8ff57019-3039-4854-aa00-998db9064999",
+  "version": "2.0",
+  "name": "02-registro",
+  "url": "http://localhost",
+  "tests": [
+    {
+      "id": "58c2f73d-213e-4a80-91d2-7adc7544a093",
+      "name": "F06 Registrar una empresa inicia sesión",
+      "commands": [
+        {
+          "id": "c76dcc1d-c46b-4d4e-ad92-9f44e840b93e",
+          "comment": "Sufijo único para los datos de la prueba",
+          "command": "executeScript",
+          "target": "return String(Date.now())",
+          "targets": [],
+          "value": "t"
+        },
+        {
+          "id": "83b966cd-24d4-4b6d-96cb-054443d62b30",
+          "comment": "",
+          "command": "open",
+          "target": "/registro",
+          "targets": [],
+          "value": ""
+        },
+        {
+          "id": "d774d51b-f5e2-4340-98f2-e55c88dc42d6",
+          "comment": "",
+          "command": "waitForElementVisible",
+          "target": "id=nombreEmpresa",
+          "targets": [],
+          "value": "10000"
+        },
+        {
+          "id": "771aa92c-45db-48d2-adff-e0f7f4c3f381",
+          "comment": "",
+          "command": "type",
+          "target": "id=nombreEmpresa",
+          "targets": [],
+          "value": "Empresa E2E ${t}"
+        },
+        {
+          "id": "233cf20d-0cfc-494f-918c-f8306f7e36e0",
+          "comment": "",
+          "command": "type",
+          "target": "id=nit",
+          "targets": [],
+          "value": "E2E${t}"
+        },
+        {
+          "id": "aebab722-8c05-4712-bcc4-357483a29139",
+          "comment": "",
+          "command": "type",
+          "target": "id=correoContacto",
+          "targets": [],
+          "value": "contacto${t}@e2e.test"
+        },
+        {
+          "id": "871630ab-cd78-401d-8058-16708d1f9718",
+          "comment": "",
+          "command": "type",
+          "target": "id=nombreAdmin",
+          "targets": [],
+          "value": "Admin E2E"
+        },
+        {
+          "id": "95785711-23c3-4bab-a4ae-4a678e0c4661",
+          "comment": "",
+          "command": "type",
+          "target": "id=emailAdmin",
+          "targets": [],
+          "value": "admin${t}@e2e.test"
+        },
+        {
+          "id": "3bfead3f-18c6-49ff-a1f2-11f2527167f2",
+          "comment": "",
+          "command": "type",
+          "target": "id=passwordAdmin",
+          "targets": [],
+          "value": "ClaveE2E123"
+        },
+        {
+          "id": "bba04999-a4de-43f5-8c8a-9e925f9c5a8c",
+          "comment": "",
+          "command": "click",
+          "target": "css=button[type=submit]",
+          "targets": [],
+          "value": ""
+        },
+        {
+          "id": "09eb2e5d-1db3-4d5b-a976-433c2a5f08d1",
+          "comment": "",
+          "command": "waitForElementVisible",
+          "target": "xpath=//button[normalize-space()='Cerrar sesión']",
+          "targets": [],
+          "value": "10000"
+        },
+        {
+          "id": "b0051652-70af-409d-890c-9d1f1a66b468",
+          "comment": "",
+          "command": "executeScript",
+          "target": "return location.pathname",
+          "targets": [],
+          "value": "ruta"
+        },
+        {
+          "id": "af3b54f8-95cf-4477-940c-727b5054c6ed",
+          "comment": "",
+          "command": "assert",
+          "target": "ruta",
+          "targets": [],
+          "value": "/"
+        }
+      ]
+    }
+  ],
+  "suites": [
+    {
+      "id": "624a7da1-0595-444e-8407-532bb598e90b",
+      "name": "02-registro",
+      "persistSession": false,
+      "parallel": false,
+      "timeout": 300,
+      "tests": [
+        "58c2f73d-213e-4a80-91d2-7adc7544a093"
+      ]
+    }
+  ],
+  "urls": [
+    "http://localhost"
+  ],
+  "plugins": []
+}

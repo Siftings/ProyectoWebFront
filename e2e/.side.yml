@@ -1,0 +1,8 @@
+# Configuración de selenium-side-runner para las suites de e2e/
+baseUrl: http://localhost
+capabilities:
+  browserName: chrome
+  goog:chromeOptions:
+    args:
+      - --headless=new
+      - --window-size=1366,900

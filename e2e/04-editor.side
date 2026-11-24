@@ -1,0 +1,366 @@
+{
+  "id": "10c7c572-1281-42fd-abb8-4f76112a77b1",
+  "version": "2.0",
+  "name": "04-editor",
+  "url": "http://localhost",
+  "tests": [
+    {
+      "id": "975388ce-5770-4e1a-8d5d-0f13e692f3d9",
+      "name": "F12 Agregar lane y actividad al diagrama",
+      "commands": [
+        {
+          "id": "4bf71428-4a68-4c6f-9fd0-fcdc6a922c7e",
+          "comment": "",
+          "command": "open",
+          "target": "/login",
+          "targets": [],
+          "value": ""
+        },
+        {
+          "id": "18f241d6-bba0-4359-a145-33c9cb54df6b",
+          "comment": "",
+          "command": "waitForElementVisible",
+          "target": "id=email",
+          "targets": [],
+          "value": "10000"
+        },
+        {
+          "id": "0df3056b-0d3e-47de-83d6-b20e5878a433",
+          "comment": "",
+          "command": "type",
+          "target": "id=email",
+          "targets": [],
+          "value": "admin@demo.com"
+        },
+        {
+          "id": "f6de7f53-4591-418e-bded-866c8e143156",
+          "comment": "",
+          "command": "type",
+          "target": "id=password",
+          "targets": [],
+          "value": "admin123"
+        },
+        {
+          "id": "36456151-4f36-4a13-bfb8-4cb5e120af38",
+          "comment": "",
+          "command": "click",
+          "target": "css=button[type=submit]",
+          "targets": [],
+          "value": ""
+        },
+        {
+          "id": "ba141f28-e677-47e3-839b-1a24a9e07878",
+          "comment": "",
+          "command": "waitForElementVisible",
+          "target": "xpath=//button[normalize-space()='Cerrar sesión']",
+          "targets": [],
+          "value": "10000"
+        },
+        {
+          "id": "9c90c6bf-8ccc-4ce1-bdfc-adc3d2d24c17",
+          "comment": "Sufijo único para los datos de la prueba",
+          "command": "executeScript",
+          "target": "return String(Date.now())",
+          "targets": [],
+          "value": "t"
+        },
+        {
+          "id": "62a9f674-6add-4669-9c88-650f41e6d7ac",
+          "comment": "",
+          "command": "open",
+          "target": "/roles/nuevo",
+          "targets": [],
+          "value": ""
+        },
+        {
+          "id": "a00a92d5-f5fe-4624-ae4e-a0e637986919",
+          "comment": "",
+          "command": "waitForElementVisible",
+          "target": "id=nombre",
+          "targets": [],
+          "value": "10000"
+        },
+        {
+          "id": "0a1054c4-8358-41e3-b800-cfd21a5556af",
+          "comment": "",
+          "command": "type",
+          "target": "id=nombre",
+          "targets": [],
+          "value": "Rol E2E ${t}"
+        },
+        {
+          "id": "ce4e5fed-1b79-44e1-986f-2cc31a447429",
+          "comment": "",
+          "command": "type",
+          "target": "id=descripcion",
+          "targets": [],
+          "value": "Rol para la prueba del editor"
+        },
+        {
+          "id": "3b03a183-31dc-44bf-9662-08cb7a542997",
+          "comment": "",
+          "command": "click",
+          "target": "css=button[type=submit]",
+          "targets": [],
+          "value": ""
+        },
+        {
+          "id": "8c374bb9-b274-4f28-b299-4aa211bf6867",
+          "comment": "",
+          "command": "waitForElementVisible",
+          "target": "xpath=//*[normalize-space()='Rol E2E ${t}']",
+          "targets": [],
+          "value": "10000"
+        },
+        {
+          "id": "669f461c-0852-4437-85b1-bcbc30291c73",
+          "comment": "",
+          "command": "open",
+          "target": "/procesos/nuevo",
+          "targets": [],
+          "value": ""
+        },
+        {
+          "id": "08b48eb4-64dd-4ddd-930c-1fbf33bfa846",
+          "comment": "",
+          "command": "waitForElementVisible",
+          "target": "id=nombre",
+          "targets": [],
+          "value": "10000"
+        },
+        {
+          "id": "ba9890ad-cd68-46e5-be87-c018083e2064",
+          "comment": "",
+          "command": "type",
+          "target": "id=nombre",
+          "targets": [],
+          "value": "E2E ${t}"
+        },
+        {
+          "id": "0978e771-9b95-40dc-9d36-13e92944217a",
+          "comment": "",
+          "command": "type",
+          "target": "id=descripcion",
+          "targets": [],
+          "value": "Creado por la prueba funcional"
+        },
+        {
+          "id": "0e3e5b3f-5ac1-42a0-9561-83f374ea0416",
+          "comment": "",
+          "command": "type",
+          "target": "id=categoria",
+          "targets": [],
+          "value": "E2E"
+        },
+        {
+          "id": "38f2aa39-4eb5-4642-86ff-fb28697800ac",
+          "comment": "",
+          "command": "click",
+          "target": "css=button[type=submit]",
+          "targets": [],
+          "value": ""
+        },
+        {
+          "id": "86bc4720-0f8d-439e-b293-56f9dbbefb1d",
+          "comment": "",
+          "command": "waitForElementVisible",
+          "target": "id=filtro-nombre",
+          "targets": [],
+          "value": "10000"
+        },
+        {
+          "id": "5aed1e3a-7862-454b-92a0-3ff48e6d9b98",
+          "comment": "",
+          "command": "type",
+          "target": "id=filtro-nombre",
+          "targets": [],
+          "value": "E2E ${t}"
+        },
+        {
+          "id": "1f057d25-5369-4971-a07a-99e9fbf1d60b",
+          "comment": "",
+          "command": "click",
+          "target": "xpath=//button[normalize-space()='Buscar']",
+          "targets": [],
+          "value": ""
+        },
+        {
+          "id": "552c706c-39a5-4aac-8185-13211da6332a",
+          "comment": "",
+          "command": "waitForElementVisible",
+          "target": "xpath=//a[normalize-space()='E2E ${t}']",
+          "targets": [],
+          "value": "10000"
+        },
+        {
+          "id": "b4a1f610-2d22-4039-a74f-0d7d1fa46660",
+          "comment": "",
+          "command": "click",
+          "target": "xpath=//a[normalize-space()='E2E ${t}']",
+          "targets": [],
+          "value": ""
+        },
+        {
+          "id": "27dc7890-fd2d-4f7e-a38c-03ffda3237f3",
+          "comment": "",
+          "command": "waitForElementVisible",
+          "target": "xpath=//a[normalize-space()='Diagrama']",
+          "targets": [],
+          "value": "10000"
+        },
+        {
+          "id": "85548aaa-0759-4fab-ac9b-a45731dc738b",
+          "comment": "",
+          "command": "click",
+          "target": "xpath=//a[normalize-space()='Diagrama']",
+          "targets": [],
+          "value": ""
+        },
+        {
+          "id": "2bba2e8c-36e8-4b66-899c-e0ae8cabcb76",
+          "comment": "",
+          "command": "waitForElementVisible",
+          "target": "css=g[aria-label^='Pool ']",
+          "targets": [],
+          "value": "10000"
+        },
+        {
+          "id": "9cd13cf1-8ffc-42f9-a2e5-b09cebd1a5fc",
+          "comment": "",
+          "command": "click",
+          "target": "css=g[aria-label^='Pool ']",
+          "targets": [],
+          "value": ""
+        },
+        {
+          "id": "d68617d8-2f9a-49c2-bfac-c67d295c9d72",
+          "comment": "",
+          "command": "waitForElementVisible",
+          "target": "xpath=//button[normalize-space()='Agregar lane']",
+          "targets": [],
+          "value": "10000"
+        },
+        {
+          "id": "ce4b7ac8-350c-472d-a101-3fcbef792a15",
+          "comment": "",
+          "command": "click",
+          "target": "xpath=//button[normalize-space()='Agregar lane']",
+          "targets": [],
+          "value": ""
+        },
+        {
+          "id": "29331bfe-c08b-4451-b4b0-566855a51ba5",
+          "comment": "",
+          "command": "waitForElementVisible",
+          "target": "id=lane-nombre",
+          "targets": [],
+          "value": "10000"
+        },
+        {
+          "id": "5f442b3e-e1c1-4868-adcb-7bfe56d08023",
+          "comment": "",
+          "command": "type",
+          "target": "id=lane-nombre",
+          "targets": [],
+          "value": "Lane E2E"
+        },
+        {
+          "id": "21e69166-b5cd-42cd-abf7-bb5791e9b9ce",
+          "comment": "",
+          "command": "select",
+          "target": "id=lane-rol",
+          "targets": [],
+          "value": "label=Rol E2E ${t}"
+        },
+        {
+          "id": "1e93e3ce-9347-4457-99b1-09ba007495ab",
+          "comment": "",
+          "command": "click",
+          "target": "xpath=//app-lane-formulario//button[@type='submit']",
+          "targets": [],
+          "value": ""
+        },
+        {
+          "id": "9f388792-8e9c-4dbd-a237-d3ec7e047fef",
+          "comment": "",
+          "command": "waitForElementVisible",
+          "target": "css=g[aria-label='Lane Lane E2E']",
+          "targets": [],
+          "value": "10000"
+        },
+        {
+          "id": "882aa954-100f-4205-a51d-8da9eb09f684",
+          "comment": "",
+          "command": "click",
+          "target": "css=g[aria-label='Lane Lane E2E']",
+          "targets": [],
+          "value": ""
+        },
+        {
+          "id": "657c897e-0c11-4898-9d00-81b79b9890e3",
+          "comment": "",
+          "command": "waitForElementVisible",
+          "target": "xpath=//button[normalize-space()='Agregar actividad']",
+          "targets": [],
+          "value": "10000"
+        },
+        {
+          "id": "767606cc-2255-4315-867b-438f2bdf3cd7",
+          "comment": "",
+          "command": "click",
+          "target": "xpath=//button[normalize-space()='Agregar actividad']",
+          "targets": [],
+          "value": ""
+        },
+        {
+          "id": "32bd0842-96a9-4226-9779-3737d2088162",
+          "comment": "",
+          "command": "waitForElementVisible",
+          "target": "id=act-nombre",
+          "targets": [],
+          "value": "10000"
+        },
+        {
+          "id": "5530e470-191e-4e5d-9e5c-d88ff01629a5",
+          "comment": "",
+          "command": "type",
+          "target": "id=act-nombre",
+          "targets": [],
+          "value": "Revisar solicitud"
+        },
+        {
+          "id": "d56bd8b2-7251-483c-818a-5b6084b2d7e2",
+          "comment": "",
+          "command": "click",
+          "target": "xpath=//app-actividad-formulario//button[@type='submit']",
+          "targets": [],
+          "value": ""
+        },
+        {
+          "id": "a0c6ddef-ec82-458c-9011-29c04f43a5ee",
+          "comment": "",
+          "command": "waitForElementVisible",
+          "target": "css=g[aria-label$=': Revisar solicitud']",
+          "targets": [],
+          "value": "10000"
+        }
+      ]
+    }
+  ],
+  "suites": [
+    {
+      "id": "1bf8004b-db41-4973-8f49-3c1f64c960d1",
+      "name": "04-editor",
+      "persistSession": false,
+      "parallel": false,
+      "timeout": 300,
+      "tests": [
+        "975388ce-5770-4e1a-8d5d-0f13e692f3d9"
+      ]
+    }
+  ],
+  "urls": [
+    "http://localhost"
+  ],
+  "plugins": []
+}

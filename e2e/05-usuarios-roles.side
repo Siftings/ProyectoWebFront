@@ -1,0 +1,388 @@
+{
+  "id": "9105d5ed-4d55-4373-91ba-a3254f7175fe",
+  "version": "2.0",
+  "name": "05-usuarios-roles",
+  "url": "http://localhost",
+  "tests": [
+    {
+      "id": "1735a748-62d2-4988-b2e6-2b695dbf0601",
+      "name": "F13 Crear un usuario EDITOR",
+      "commands": [
+        {
+          "id": "aebb8993-6eb4-43f2-914b-ef76abb0c2b5",
+          "comment": "",
+          "command": "open",
+          "target": "/login",
+          "targets": [],
+          "value": ""
+        },
+        {
+          "id": "f4d71ed7-3daf-4824-99ab-bbab69a4a78d",
+          "comment": "",
+          "command": "waitForElementVisible",
+          "target": "id=email",
+          "targets": [],
+          "value": "10000"
+        },
+        {
+          "id": "32245f3c-7fa8-40ae-8ba0-0c5ece356cc0",
+          "comment": "",
+          "command": "type",
+          "target": "id=email",
+          "targets": [],
+          "value": "admin@demo.com"
+        },
+        {
+          "id": "e1b8aa9d-c5c7-4744-b9b2-51d79ac19803",
+          "comment": "",
+          "command": "type",
+          "target": "id=password",
+          "targets": [],
+          "value": "admin123"
+        },
+        {
+          "id": "8bde9b33-f1fc-403a-88fe-8e362d59115d",
+          "comment": "",
+          "command": "click",
+          "target": "css=button[type=submit]",
+          "targets": [],
+          "value": ""
+        },
+        {
+          "id": "02e62197-2113-4083-949b-2a278c5c284b",
+          "comment": "",
+          "command": "waitForElementVisible",
+          "target": "xpath=//button[normalize-space()='Cerrar sesión']",
+          "targets": [],
+          "value": "10000"
+        },
+        {
+          "id": "81852c55-7540-4b52-ad17-2d562173ff14",
+          "comment": "Sufijo único para los datos de la prueba",
+          "command": "executeScript",
+          "target": "return String(Date.now())",
+          "targets": [],
+          "value": "t"
+        },
+        {
+          "id": "174c2e65-67f2-4167-bc6c-70d0424b166a",
+          "comment": "",
+          "command": "open",
+          "target": "/usuarios/nuevo",
+          "targets": [],
+          "value": ""
+        },
+        {
+          "id": "ade78e2e-3206-4286-9445-c9b86f923d50",
+          "comment": "",
+          "command": "waitForElementVisible",
+          "target": "id=nombre",
+          "targets": [],
+          "value": "10000"
+        },
+        {
+          "id": "28f86b50-63e0-476f-bdbd-f462b057acd1",
+          "comment": "",
+          "command": "type",
+          "target": "id=nombre",
+          "targets": [],
+          "value": "Editor E2E ${t}"
+        },
+        {
+          "id": "a81e923b-5b3d-4aab-a473-f8c079c3de1f",
+          "comment": "",
+          "command": "type",
+          "target": "id=email",
+          "targets": [],
+          "value": "editor${t}@e2e.test"
+        },
+        {
+          "id": "6fe966a5-d37f-4caf-ba86-e36c6a3071dd",
+          "comment": "",
+          "command": "type",
+          "target": "id=password",
+          "targets": [],
+          "value": "ClaveE2E123"
+        },
+        {
+          "id": "91be593a-633a-42e5-a71f-308de03bfda8",
+          "comment": "",
+          "command": "select",
+          "target": "id=rolAcceso",
+          "targets": [],
+          "value": "value=EDITOR"
+        },
+        {
+          "id": "9eef0df8-01e2-4ecc-95b9-16d880e0d68e",
+          "comment": "",
+          "command": "click",
+          "target": "css=button[type=submit]",
+          "targets": [],
+          "value": ""
+        },
+        {
+          "id": "4ca95286-cf33-4a7f-aae5-077f621fc05d",
+          "comment": "",
+          "command": "waitForElementVisible",
+          "target": "xpath=//td[normalize-space()='editor${t}@e2e.test']",
+          "targets": [],
+          "value": "10000"
+        }
+      ]
+    },
+    {
+      "id": "94a1c9e9-68ae-4a2a-b1a3-397fd56ad594",
+      "name": "F14 Usuario con contraseña corta valida el campo",
+      "commands": [
+        {
+          "id": "52237b8e-95e4-4fa3-a40a-b6488d489982",
+          "comment": "",
+          "command": "open",
+          "target": "/login",
+          "targets": [],
+          "value": ""
+        },
+        {
+          "id": "8b9660a8-6564-4dcb-81c7-c75f22c4cc90",
+          "comment": "",
+          "command": "waitForElementVisible",
+          "target": "id=email",
+          "targets": [],
+          "value": "10000"
+        },
+        {
+          "id": "1680dc3d-0b9b-42e8-94fe-9524ef189d04",
+          "comment": "",
+          "command": "type",
+          "target": "id=email",
+          "targets": [],
+          "value": "admin@demo.com"
+        },
+        {
+          "id": "bbacc489-0eb2-46c7-a011-c7dc10802966",
+          "comment": "",
+          "command": "type",
+          "target": "id=password",
+          "targets": [],
+          "value": "admin123"
+        },
+        {
+          "id": "0bf37fa8-5eeb-428e-85f3-ad05fa2e2cbf",
+          "comment": "",
+          "command": "click",
+          "target": "css=button[type=submit]",
+          "targets": [],
+          "value": ""
+        },
+        {
+          "id": "6449904a-2785-4d33-b933-d83eeb8ab5b2",
+          "comment": "",
+          "command": "waitForElementVisible",
+          "target": "xpath=//button[normalize-space()='Cerrar sesión']",
+          "targets": [],
+          "value": "10000"
+        },
+        {
+          "id": "4cfaf661-485c-4a07-b0eb-3884e1687bc4",
+          "comment": "",
+          "command": "open",
+          "target": "/usuarios/nuevo",
+          "targets": [],
+          "value": ""
+        },
+        {
+          "id": "1d686855-2660-472f-8645-ed52b26509c5",
+          "comment": "",
+          "command": "waitForElementVisible",
+          "target": "id=nombre",
+          "targets": [],
+          "value": "10000"
+        },
+        {
+          "id": "5c255779-5c99-4f86-b4fc-b46e6960db44",
+          "comment": "",
+          "command": "type",
+          "target": "id=nombre",
+          "targets": [],
+          "value": "Corta"
+        },
+        {
+          "id": "7fa54cb1-f330-4d60-b472-1d2fb6e0ce33",
+          "comment": "",
+          "command": "type",
+          "target": "id=email",
+          "targets": [],
+          "value": "corta@e2e.test"
+        },
+        {
+          "id": "5ee16df3-dd02-4c6e-9db3-973ed5763496",
+          "comment": "",
+          "command": "type",
+          "target": "id=password",
+          "targets": [],
+          "value": "1234567"
+        },
+        {
+          "id": "1b9ddc85-e760-45d9-bfd6-f271e6e5144e",
+          "comment": "",
+          "command": "click",
+          "target": "css=button[type=submit]",
+          "targets": [],
+          "value": ""
+        },
+        {
+          "id": "4506823d-7ea4-4863-a502-f0d41c567f0c",
+          "comment": "",
+          "command": "waitForElementVisible",
+          "target": "xpath=//*[contains(@class,'error-campo') and contains(.,'8 caracteres')]",
+          "targets": [],
+          "value": "10000"
+        },
+        {
+          "id": "de869796-bd0f-4d4d-ab24-d909c07741fc",
+          "comment": "",
+          "command": "executeScript",
+          "target": "return location.pathname",
+          "targets": [],
+          "value": "ruta"
+        },
+        {
+          "id": "a0e52028-aec6-4487-a754-ea1544a8bd30",
+          "comment": "",
+          "command": "assert",
+          "target": "ruta",
+          "targets": [],
+          "value": "/usuarios/nuevo"
+        }
+      ]
+    },
+    {
+      "id": "f7779e36-baf5-4b1f-9880-7f818d3c26b9",
+      "name": "F15 Crear un rol de proceso",
+      "commands": [
+        {
+          "id": "4b2fe256-1ba3-480a-a564-6928b67c3467",
+          "comment": "",
+          "command": "open",
+          "target": "/login",
+          "targets": [],
+          "value": ""
+        },
+        {
+          "id": "db5e0f98-894c-4297-b0cc-a7bfb6980cc9",
+          "comment": "",
+          "command": "waitForElementVisible",
+          "target": "id=email",
+          "targets": [],
+          "value": "10000"
+        },
+        {
+          "id": "010dcf98-a4ed-4e84-bcdc-a4c4b3e215ed",
+          "comment": "",
+          "command": "type",
+          "target": "id=email",
+          "targets": [],
+          "value": "admin@demo.com"
+        },
+        {
+          "id": "cf77f054-8085-4675-9bdc-a24d91cea8c7",
+          "comment": "",
+          "command": "type",
+          "target": "id=password",
+          "targets": [],
+          "value": "admin123"
+        },
+        {
+          "id": "e7255720-4c6b-493b-9aa1-6a854ce22247",
+          "comment": "",
+          "command": "click",
+          "target": "css=button[type=submit]",
+          "targets": [],
+          "value": ""
+        },
+        {
+          "id": "fc1d9da2-994d-4e0c-a419-a6b21eebcac2",
+          "comment": "",
+          "command": "waitForElementVisible",
+          "target": "xpath=//button[normalize-space()='Cerrar sesión']",
+          "targets": [],
+          "value": "10000"
+        },
+        {
+          "id": "32e92921-023b-45e4-b09d-c089801a6b38",
+          "comment": "Sufijo único para los datos de la prueba",
+          "command": "executeScript",
+          "target": "return String(Date.now())",
+          "targets": [],
+          "value": "t"
+        },
+        {
+          "id": "f13a6ea2-158c-4bad-9fa4-8c1ee12add3f",
+          "comment": "",
+          "command": "open",
+          "target": "/roles/nuevo",
+          "targets": [],
+          "value": ""
+        },
+        {
+          "id": "ed244102-dce4-4594-8561-fb9c41e25108",
+          "comment": "",
+          "command": "waitForElementVisible",
+          "target": "id=nombre",
+          "targets": [],
+          "value": "10000"
+        },
+        {
+          "id": "01e6abe8-5fe1-4a4d-bcf8-142f76d0a681",
+          "comment": "",
+          "command": "type",
+          "target": "id=nombre",
+          "targets": [],
+          "value": "Rol E2E ${t}"
+        },
+        {
+          "id": "3c919b71-dcd4-4c2b-9fc4-ae278be0c1ff",
+          "comment": "",
+          "command": "type",
+          "target": "id=descripcion",
+          "targets": [],
+          "value": "Creado por la prueba funcional"
+        },
+        {
+          "id": "6bda2555-c610-4d52-99b7-1874f6a35605",
+          "comment": "",
+          "command": "click",
+          "target": "css=button[type=submit]",
+          "targets": [],
+          "value": ""
+        },
+        {
+          "id": "1202ad92-d523-4f19-ae9b-873a530c365a",
+          "comment": "",
+          "command": "waitForElementVisible",
+          "target": "xpath=//*[normalize-space()='Rol E2E ${t}']",
+          "targets": [],
+          "value": "10000"
+        }
+      ]
+    }
+  ],
+  "suites": [
+    {
+      "id": "a87c5c8d-aba8-4323-b76b-e971b3122206",
+      "name": "05-usuarios-roles",
+      "persistSession": false,
+      "parallel": false,
+      "timeout": 300,
+      "tests": [
+        "1735a748-62d2-4988-b2e6-2b695dbf0601",
+        "94a1c9e9-68ae-4a2a-b1a3-397fd56ad594",
+        "f7779e36-baf5-4b1f-9880-7f818d3c26b9"
+      ]
+    }
+  ],
+  "urls": [
+    "http://localhost"
+  ],
+  "plugins": []
+}
